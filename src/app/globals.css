@@ -1,26 +1,112 @@
 @import "tailwindcss";
 
+/* ============ CUSTOM VARIABLES ============ */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #eeeeee;
+  --foreground: #272727;
+
+  --screen-sm: 375px;
+  --screen-md: 768px;
+  --screen-lg: 1200px;
+
+  /* ✅ bind font-sans → gotham */
+  --font-sans: var(--font-gotham), sans-serif;
 }
 
+/* ============ TAILWIND THEME ============ */
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+
+  --font-sans: var(--font-sans); /* <-- สะท้อนขึ้นมาที่ theme */
+  --font-mono: var(--font-geist-mono); /* ถ้ายังใช้ mono แบบ geist ได้ */
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
+/* ============ BODY STYLE ============ */
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+}
+
+/* ============ CONTAINER UTILITY ============ */
+.container {
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+@media (min-width: 768px) {
+  .container {
+    padding-left: 2rem;
+    padding-right: 2rem;
+  }
+}
+
+@media (min-width: 1200px) {
+  .container {
+    padding-left: 4rem;
+    padding-right: 4rem;
+  }
+}
+
+.stroke-layer {
+  text-shadow:
+    /* ระยะ 4px */ -4px -4px 0 white, 4px -4px 0 white,
+    -4px 4px 0 white, 4px 4px 0 white, 0px 4px 0 white, 4px 0px 0 white,
+    -4px 0px 0 white, 0px -4px 0 white, /* ระยะ 6px */ -6px -6px 0 white,
+    6px -6px 0 white, -6px 6px 0 white, 6px 6px 0 white, 0px 6px 0 white,
+    6px 0px 0 white, -6px 0px 0 white, 0px -6px 0 white,
+    /* ระยะ 8px */ -8px -8px 0 white, 8px -8px 0 white, -8px 8px 0 white,
+    8px 8px 0 white, 0px 8px 0 white, 8px 0px 0 white, -8px 0px 0 white,
+    0px -8px 0 white, /* ระยะ 10px */ -10px -10px 0 white, 10px -10px 0 white,
+    -10px 10px 0 white, 10px 10px 0 white, 0px 10px 0 white, 10px 0px 0 white,
+    -10px 0px 0 white, 0px -10px 0 white, /* ระยะ 12px */ -12px -12px 0 white,
+    12px -12px 0 white, -12px 12px 0 white, 12px 12px 0 white, 0px 12px 0 white,
+    12px 0px 0 white, -12px 0px 0 white, 0px -12px 0 white,
+    /* ระยะ 14px */ -14px -14px 0 white, 14px -12px 0 white, -14px 12px 0 white,
+    14px 12px 0 white, 0px 14px 0 white, 14px 0px 0 white, -14px 0px 0 white,
+    0px -14px 0 white;
+}
+
+.stroke-layer2 {
+  text-shadow:
+    /* ระยะ 4px */ -4px -4px 0 #4e4e4e, 4px -4px 0 #4e4e4e,
+    -4px 4px 0 #4e4e4e, 4px 4px 0 #4e4e4e, 0px 4px 0 #4e4e4e, 4px 0px 0 #4e4e4e,
+    -4px 0px 0 #4e4e4e, 0px -4px 0 #4e4e4e, /* ระยะ 6px */ -6px -6px 0 #4e4e4e,
+    6px -6px 0 #4e4e4e, -6px 6px 0 #4e4e4e, 6px 6px 0 #4e4e4e, 0px 6px 0 #4e4e4e,
+    6px 0px 0 #4e4e4e, -6px 0px 0 #4e4e4e, 0px -6px 0 #4e4e4e,
+    /* ระยะ 8px */ -8px -8px 0 #4e4e4e, 8px -8px 0 #4e4e4e, -8px 8px 0 #4e4e4e,
+    8px 8px 0 #4e4e4e, 0px 8px 0 #4e4e4e, 8px 0px 0 #4e4e4e, -8px 0px 0 #4e4e4e,
+    0px -8px 0 #4e4e4e, /* ระยะ 10px */ -10px -10px 0 #4e4e4e,
+    10px -10px 0 #4e4e4e, -10px 10px 0 #4e4e4e, 10px 10px 0 #4e4e4e,
+    0px 10px 0 #4e4e4e, 10px 0px 0 #4e4e4e, -10px 0px 0 #4e4e4e,
+    0px -10px 0 #4e4e4e, /* ระยะ 12px */ -12px -12px 0 #4e4e4e,
+    12px -12px 0 #4e4e4e, -12px 12px 0 #4e4e4e, 12px 12px 0 #4e4e4e,
+    0px 12px 0 #4e4e4e, 12px 0px 0 #4e4e4e, -12px 0px 0 #4e4e4e,
+    0px -12px 0 #4e4e4e, /* ระยะ 14px */ -14px -14px 0 #4e4e4e,
+    14px -12px 0 #4e4e4e, -14px 12px 0 #4e4e4e, 14px 12px 0 #4e4e4e,
+    0px 14px 0 #4e4e4e, 14px 0px 0 #4e4e4e, -14px 0px 0 #4e4e4e,
+    0px -14px 0 #4e4e4e;
+}
+
+.stroke-layer3 {
+  text-shadow:
+    /* ระยะ 4px */ -4px -4px 0 #fdefb8, 4px -4px 0 #fdefb8,
+    -4px 4px 0 #fdefb8, 4px 4px 0 #fdefb8, 0px 4px 0 #fdefb8, 4px 0px 0 #fdefb8,
+    -4px 0px 0 #fdefb8, 0px -4px 0 #fdefb8, /* ระยะ 6px */ -6px -6px 0 #fdefb8,
+    6px -6px 0 #fdefb8, -6px 6px 0 #fdefb8, 6px 6px 0 #fdefb8, 0px 6px 0 #fdefb8,
+    6px 0px 0 #fdefb8, -6px 0px 0 #fdefb8, 0px -6px 0 #fdefb8,
+    /* ระยะ 8px */ -8px -8px 0 #fdefb8, 8px -8px 0 #fdefb8, -8px 8px 0 #fdefb8,
+    8px 8px 0 #fdefb8, 0px 8px 0 #fdefb8, 8px 0px 0 #fdefb8, -8px 0px 0 #fdefb8,
+    0px -8px 0 #fdefb8, /* ระยะ 10px */ -10px -10px 0 #fdefb8,
+    10px -10px 0 #fdefb8, -10px 10px 0 #fdefb8, 10px 10px 0 #fdefb8,
+    0px 10px 0 #fdefb8, 10px 0px 0 #fdefb8, -10px 0px 0 #fdefb8,
+    0px -10px 0 #fdefb8, /* ระยะ 12px */ -12px -12px 0 #fdefb8,
+    12px -12px 0 #fdefb8, -12px 12px 0 #fdefb8, 12px 12px 0 #fdefb8,
+    0px 12px 0 #fdefb8, 12px 0px 0 #fdefb8, -12px 0px 0 #fdefb8,
+    0px -12px 0 #fdefb8, /* ระยะ 14px */ -14px -14px 0 #fdefb8,
+    14px -12px 0 #fdefb8, -14px 12px 0 #fdefb8, 14px 12px 0 #fdefb8,
+    0px 14px 0 #fdefb8, 14px 0px 0 #fdefb8, -14px 0px 0 #fdefb8,
+    0px -14px 0 #fdefb8;
 }
