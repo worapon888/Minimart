@@ -25,3 +25,35 @@ export const logos = [
   { name: "Nike", image: "/logo/logo_thicker6_6.png" },
   { name: "AIIZ", image: "/logo/logo_thicker7_7.png" },
 ];
+export const FeatureProducts = [
+  {
+    name: "Nike Ryan Plomp",
+    image: "/FeatureImage/FeatureImage_1.avif",
+    price: 25.0,
+    tag: "New",
+  },
+  {
+    name: "Women Dress Green",
+    image: "/FeatureImage/FeatureImage_2.avif",
+    price: 15.99,
+  },
+  {
+    name: "White Shirt",
+    image: "/FeatureImage/FeatureImage_3.avif",
+    price: 18.79,
+  },
+  {
+    name: "Seiko Watch",
+    image: "/FeatureImage/FeatureImage_4.avif",
+    price: 39.59,
+  },
+];
+
+export const categories = [
+  { name: "Men", image: "/CategorisProducts/Categories_1.avif" },
+  { name: "Women", image: "/CategorisProducts/Categories_2.avif" },
+  { name: "Shoe", image: "/CategorisProducts/Categories_3.avif" },
+  { name: "Kid’s", image: "/CategorisProducts/Categories_4.avif" },
+  { name: "Watch", image: "/CategorisProducts/Categories_5.avif" },
+  { name: "Jewelry", image: "/CategorisProducts/Categories_7.avif" },
+];

@@ -4,6 +4,9 @@ import Image from "next/image";
 import { HeroImage } from "../../data";
 import Link from "next/link";
 import LogoTicker from "@/components/LogoTicker";
+import FeaturesProducts from "@/components/FeaturesProducts";
+import CategoriesProducts from "@/components/CategoreisProducts";
+import WhyMinimalMart from "@/components/WhyMinimalMart";
 
 export default function Hero() {
   return (
@@ -87,6 +90,9 @@ export default function Hero() {
         </div>
       </div>
       <LogoTicker />
+      <FeaturesProducts />
+      <CategoriesProducts />
+      <WhyMinimalMart />
     </section>
   );
 }
