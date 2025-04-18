@@ -1,3 +1,5 @@
+import { NavItem } from "@/types/product";
+
 export const HeroImage = [
   {
     img: "/hero_img1.avif",
@@ -56,4 +58,11 @@ export const categories = [
   { name: "Kid’s", image: "/CategorisProducts/Categories_4.avif" },
   { name: "Watch", image: "/CategorisProducts/Categories_5.avif" },
   { name: "Jewelry", image: "/CategorisProducts/Categories_7.avif" },
+];
+
+export const NavbarItem: NavItem[] = [
+  { item: "Home", href: "/" },
+  { item: "Products", href: "/products" },
+  { item: "About Us", href: "/about-us" },
+  { item: "Contact", href: "/contact" },
 ];

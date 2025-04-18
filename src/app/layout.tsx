@@ -16,9 +16,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className={`${Gotham.variable}`}>
-      <body className="min-h-screen font-gotham bg-white text-black ">
+      <body className="min-h-screen flex flex-col font-gotham ">
         <Header />
-        <main className="pt-4">{children}</main>
+        <main className="pt-4 flex-grow">{children}</main>
         <Footer />
       </body>
     </html>

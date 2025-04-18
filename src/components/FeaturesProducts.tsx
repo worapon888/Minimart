@@ -1,8 +1,32 @@
+"use client";
+
 import { FaPlus } from "react-icons/fa";
-import { FeatureProducts } from "../../data";
+
 import Image from "next/image";
+import { Product } from "@/types/product";
+import { useEffect, useState } from "react";
+import Link from "next/link";
 
 export default function FeaturesProducts() {
+  const [products, setProducts] = useState<Product[]>([]);
+
+  useEffect(() => {
+    fetch("/api/products")
+      .then((res) => res.json())
+      .then((data) => {
+        // ถ้าใช้ mock แบบที่คุณมี ใช้ title → name
+        const featured = data.slice(0, 4).map((item: any) => ({
+          id: item.id.toString(),
+          title: item.title,
+          price: item.price,
+          image: item.image,
+          category: item.category,
+          tag: item.tag,
+        }));
+        setProducts(featured);
+      });
+  }, []);
+
   return (
     <section className="py-5 px-6">
       {/* Header */}
@@ -26,8 +50,7 @@ export default function FeaturesProducts() {
 
       {/* Grid Layout */}
       <div className="grid grid-cols-4 grid-rows-2 gap-4">
-        {FeatureProducts.map((product, index) => {
-          // จัด layout ทีละอัน
+        {products.map((product, index) => {
           let spanClass = "";
 
           if (index === 0) {
@@ -41,25 +64,26 @@ export default function FeaturesProducts() {
           }
 
           return (
-            <div
-              key={product.name}
-              className={`rounded-xl overflow-hidden bg-white shadow-sm ${spanClass} flex flex-col  transform transition-all hover:scale-105 duration-400`}
+            <Link
+              key={product.id}
+              href={`/product/${product.id}`}
+              className={`rounded-xl overflow-hidden bg-white shadow-sm ${spanClass} flex flex-col transform transition-all hover:scale-105 duration-400`}
             >
-              <div className="relative flex-1 cursor-pointer">
+              <div className="relative flex-1">
                 {index === 2 || index === 3 ? (
                   <Image
                     src={product.image}
-                    alt={product.name}
+                    alt={product.title}
                     width={700}
                     height={700}
-                    className="w-full h-[700px] object-cover"
+                    className="w-full h-[700px] object-contain"
                   />
                 ) : (
                   <Image
                     src={product.image}
-                    alt={product.name}
+                    alt={product.title}
                     fill
-                    className="object-cover w-full h-full"
+                    className="object-contain w-full h-full"
                   />
                 )}
                 {product.tag && (
@@ -69,14 +93,14 @@ export default function FeaturesProducts() {
                 )}
               </div>
               <div className="p-4">
-                <p className="font-medium text-xl tracking-wider">
-                  {product.name}
+                <p className="font-medium text-xl tracking-wider truncate">
+                  {product.title}
                 </p>
                 <p className="text-gray-600 text-xl font-medium">
                   ${product.price.toFixed(2)}
                 </p>
               </div>
-            </div>
+            </Link>
           );
         })}
       </div>

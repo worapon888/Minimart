@@ -2,10 +2,19 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { categories } from "../../data";
 import { FaPlus } from "react-icons/fa";
+import { Category } from "@/types/product";
+import { useEffect, useState } from "react";
 
 export default function CategoriesProducts() {
+  const [categories, setCategories] = useState<Category[]>([]);
+
+  useEffect(() => {
+    fetch("/api/categories")
+      .then((res) => res.json())
+      .then((data: Category[]) => setCategories(data));
+  }, []);
+
   return (
     <section className="py-12 px-6 space-y-12">
       {/* Section Header */}
@@ -26,18 +35,21 @@ export default function CategoriesProducts() {
       {/* Category Grid */}
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
         {categories.map((cat) => (
-          <Link href={`/products/${cat.name.toLowerCase()}`} key={cat.name}>
-            <div className="rounded-2xl overflow-hidden  bg-white shadow-sm hover:shadow-lg transform transition-all hover:scale-105 duration-400 cursor-pointer">
+          <Link
+            href={`/products/${cat.category.toLowerCase()}`}
+            key={cat.category}
+          >
+            <div className="rounded-2xl overflow-hidden bg-white shadow-sm hover:shadow-lg transform transition-all hover:scale-105 duration-400 cursor-pointer">
               <div className="relative h-60 sm:h-80">
                 <Image
                   src={cat.image}
-                  alt={cat.name}
+                  alt={cat.category}
                   fill
-                  className="object-cover"
+                  className="object-contain"
                 />
                 <div className="absolute bottom-0 w-full bg-gradient-to-t from-black/60 to-transparent px-4 py-4 text-center backdrop-blur-3xl">
-                  <span className="text-2xl font-semibold text-white  tracking-wide">
-                    {cat.name}
+                  <span className="text-2xl font-semibold text-white tracking-wide">
+                    {cat.category}
                   </span>
                 </div>
               </div>
