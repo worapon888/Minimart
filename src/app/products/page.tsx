@@ -6,6 +6,7 @@ import { Product } from "@/types/product";
 import Image from "next/image";
 import Link from "next/link";
 import { useCart } from "@/context/CartContext";
+import { useSearchParams } from "next/navigation";
 
 export default function ProductsPage() {
   const [products, setProducts] = useState<Product[]>([]);
@@ -19,20 +20,42 @@ export default function ProductsPage() {
     setFiltered(allProducts);
   }, []);
 
+  const searchParams = useSearchParams();
+  const search = searchParams.get("search")?.toLowerCase() || "";
+
+  const handleFilter = () => {
+    let result = products;
+
+    // Search filter
+    if (search) {
+      result = result.filter((p) => p.title.toLowerCase().includes(search));
+    }
+
+    // Category filter
+    if (category !== "All") {
+      result = result.filter((p) => p.category === category);
+    }
+
+    // Price filter
+    result = result.filter(
+      (p) => p.price >= priceRange[0] && p.price <= priceRange[1]
+    );
+
+    setFiltered(result);
+  };
+
   const uniqueCategories = [
     "All",
     ...Array.from(new Set(allProducts.map((p) => p.category))),
   ];
 
-  const handleFilter = () => {
-    const result = products.filter(
-      (p) =>
-        (category === "All" || p.category === category) &&
-        p.price >= priceRange[0] &&
-        p.price <= priceRange[1]
-    );
-    setFiltered(result);
-  };
+  useEffect(() => {
+    setProducts(allProducts);
+  }, []);
+
+  useEffect(() => {
+    handleFilter();
+  }, [search, category, priceRange, products]);
 
   const handleClear = () => {
     setCategory("All");

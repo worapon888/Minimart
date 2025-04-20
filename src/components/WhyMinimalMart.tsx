@@ -15,14 +15,14 @@ export default function WhyMinimalMart() {
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-12 max-w-6xl mx-auto">
         {/* Feature 1 */}
         <div className="space-y-2">
-          <FaRegLightbulb className="mx-auto text-6xl text-gray-700" />
+          <FaRegLightbulb className="mx-auto text-6xl " />
           <h3 className="text-2xl font-medium">Curated with intention</h3>
           <p className="font-normal text-lg">→ Every piece serves a purpose.</p>
         </div>
 
         {/* Feature 2 */}
         <div className="space-y-2">
-          <FaTruck className="mx-auto text-6xl text-gray-700" />
+          <FaTruck className="mx-auto text-6xl " />
           <h3 className="text-2xl font-medium">Mindful delivery</h3>
           <p className="font-normal text-lg">→ Quick, clean, caring.</p>
         </div>

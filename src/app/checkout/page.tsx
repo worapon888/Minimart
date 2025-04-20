@@ -5,12 +5,20 @@ import Image from "next/image";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { CiCircleRemove } from "react-icons/ci";
+import { FaSpinner } from "react-icons/fa";
 
 export default function CheckoutPage() {
   const { state, dispatch } = useCart();
   const router = useRouter();
+  const [isLoading, setIsLoading] = useState(false);
 
   const [form, setForm] = useState({
+    name: "",
+    tel: "",
+    address: "",
+    email: "",
+  });
+  const [errors, setErrors] = useState({
     name: "",
     tel: "",
     address: "",
@@ -19,21 +27,43 @@ export default function CheckoutPage() {
   const handleInput = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+
+    // อัปเดตค่าฟอร์ม
+    setForm((prev) => ({ ...prev, [name]: value }));
+
+    // เคลียร์ error เฉพาะช่องที่กำลังกรอก
+    setErrors((prev) => ({ ...prev, [name]: "" }));
   };
 
   const handleCheckout = () => {
-    if (!form.name || !form.tel || !form.address) {
-      alert("Please fill in all shipping information.");
-      return;
+    let hasError = false;
+    const newErrors = { name: "", tel: "", address: "" };
+
+    if (!form.name.trim()) {
+      newErrors.name = "Please enter your name.";
+      hasError = true;
+    }
+    if (!/^[0-9]{9,10}$/.test(form.tel)) {
+      newErrors.tel = "Phone number must be 9–10 digits.";
+      hasError = true;
+    }
+    if (!form.address.trim()) {
+      newErrors.address = "Please enter your address.";
+      hasError = true;
     }
 
-    // Clear cart and redirect (mock)
-    state.items.forEach((item) =>
-      dispatch({ type: "REMOVE_ITEM", payload: item.id })
-    );
+    setErrors(newErrors);
+    if (hasError) return;
 
-    router.push("/order-success");
+    // ✅ เริ่มโหลด
+    setIsLoading(true);
+
+    // จำลอง delay (ถ้าไม่มี backend จริง)
+    setTimeout(() => {
+      dispatch({ type: "CLEAR_CART" });
+      router.push("/order-success");
+    }, 1500);
   };
 
   const subtotal = state.items.reduce(
@@ -127,29 +157,67 @@ export default function CheckoutPage() {
             <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
               Shipping address
             </h2>
-            <div className="space-y-4">
-              <input
-                name="name"
-                placeholder="Name"
-                value={form.name}
-                onChange={handleInput}
-                className="w-full border rounded px-4 py-2"
-              />
-              <input
-                name="tel"
-                placeholder="Tel"
-                value={form.tel}
-                onChange={handleInput}
-                className="w-full border rounded px-4 py-2"
-              />
-              <textarea
-                name="address"
-                placeholder="Address"
-                value={form.address}
-                onChange={handleInput}
-                className="w-full border rounded px-4 py-2"
-                rows={4}
-              />
+            <div className="space-y-6">
+              {/* Name Field */}
+              <div className="relative">
+                <input
+                  name="name"
+                  placeholder="Name"
+                  value={form.name}
+                  onChange={handleInput}
+                  className={`w-full border rounded px-4 py-2 ${
+                    errors.name
+                      ? "border-red-500 border-2"
+                      : "border-gray-300 border-2"
+                  }`}
+                />
+                {errors.name && (
+                  <div className="absolute -top-7 left-2  bg-amber-300 text-red-500 font-medium text-xs rounded px-2 py-1 shadow z-10 animate-fade-in">
+                    {errors.name}
+                  </div>
+                )}
+              </div>
+
+              {/* Tel Field */}
+              <div className="relative">
+                <input
+                  name="tel"
+                  placeholder="Tel"
+                  value={form.tel}
+                  onChange={handleInput}
+                  className={`w-full border rounded px-4 py-2 ${
+                    errors.tel
+                      ? "border-red-500 border-2"
+                      : "border-gray-300 border-2"
+                  }`}
+                />
+                {errors.tel && (
+                  <div className="absolute -top-7 left-2 bg-amber-300 text-red-500 font-medium text-xs rounded px-2 py-1 shadow z-10 animate-fade-in">
+                    {errors.tel}
+                  </div>
+                )}
+              </div>
+
+              {/* Address Field */}
+              <div className="relative">
+                <textarea
+                  name="address"
+                  placeholder="Address"
+                  value={form.address}
+                  onChange={handleInput}
+                  rows={4}
+                  className={`w-full border rounded px-4 py-2 ${
+                    errors.address
+                      ? "border-red-500 border-2"
+                      : "border-gray-300 border-2"
+                  }`}
+                />
+                {errors.address && (
+                  <div className="absolute -top-7 left-2  bg-amber-300 text-red-500 font-medium text-xs rounded px-2 py-1 shadow z-10 animate-fade-in">
+                    {errors.address}
+                  </div>
+                )}
+              </div>
             </div>
           </div>
 
@@ -169,11 +237,22 @@ export default function CheckoutPage() {
               <span>Total</span>
               <span>${total.toFixed(2)}</span>
             </div>
+
             <button
               onClick={handleCheckout}
-              className="w-full bg-[#2F2F2F] text-white py-2 rounded-2xl hover:opacity-90 cursor-pointer"
+              disabled={isLoading}
+              className={`w-full bg-[#2F2F2F] text-white py-2 rounded-2xl hover:opacity-90 transition cursor-pointer ${
+                isLoading ? "opacity-60 cursor-not-allowed" : ""
+              }`}
             >
-              Checkout
+              {isLoading ? (
+                <div className="flex items-center justify-center gap-2">
+                  <FaSpinner className="animate-spin" />
+                  Processing...
+                </div>
+              ) : (
+                "Checkout"
+              )}
             </button>
           </div>
         </div>

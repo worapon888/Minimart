@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { Gotham } from "@/app/fonts";
-import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import { CartProvider } from "@/context/CartContext";
+import Header from "@/components/Header";
+import ClientProviders from "./ClientProviders";
 
 export const metadata: Metadata = {
   title: "MinimalMart",
@@ -18,11 +18,11 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${Gotham.variable}`}>
       <body className="min-h-screen flex flex-col font-gotham">
-        <CartProvider>
+        <ClientProviders>
           <Header />
           <main className="pt-4 flex-grow">{children}</main>
           <Footer />
-        </CartProvider>
+        </ClientProviders>
       </body>
     </html>
   );
