@@ -1,16 +1,20 @@
 "use client";
 
 import Image from "next/image";
-import { useState } from "react";
 import { FaSearch, FaShoppingBag, FaUser } from "react-icons/fa";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
+import { useCart } from "@/context/CartContext";
 
 import { NavbarItem } from "../../data";
 
 export default function Header() {
-  const [cartCount] = useState(4);
   const pathname = usePathname();
+  const { state } = useCart();
+  const cartCount = state.items.reduce(
+    (total, item) => total + item.quantity,
+    0
+  );
 
   return (
     <header className="container mx-auto py-6 px-6 flex items-center justify-between w-full">
@@ -58,15 +62,16 @@ export default function Header() {
         </div>
 
         {/* Cart icon with badge */}
-        <div className="relative bg-gray-200 rounded-full p-3 cursor-pointer">
-          <FaShoppingBag className="text-xl" />
-          {cartCount > 0 && (
-            <span className="absolute -top-1 -right-1 text-[10px] bg-red-500 text-white px-1.5 rounded-full">
-              {cartCount}
-            </span>
-          )}
-        </div>
-
+        <Link href="/checkout">
+          <div className="relative bg-gray-200 rounded-full p-3 cursor-pointer">
+            <FaShoppingBag className="text-xl" />
+            {cartCount > 0 && (
+              <span className="absolute -top-1 -right-1 text-[14px] bg-red-500 text-white px-1.5 rounded-[100%]">
+                {cartCount}
+              </span>
+            )}
+          </div>
+        </Link>
         {/* User icon */}
         <div className="bg-gray-200 rounded-full p-3 cursor-pointer">
           <FaUser className="text-xl" />

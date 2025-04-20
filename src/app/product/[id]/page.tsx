@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { Product } from "@/types/product";
+import { useCart } from "@/context/CartContext";
 
 const sizes = ["S", "M", "L", "XL", "2XL"];
 
@@ -12,6 +13,7 @@ export default function ProductDetailPage() {
   const [product, setProduct] = useState<Product | null>(null);
   const [selectedSize, setSelectedSize] = useState("M");
   const [quantity, setQuantity] = useState(1);
+  const { dispatch } = useCart();
 
   useEffect(() => {
     fetch("/api/products")
@@ -100,7 +102,10 @@ export default function ProductDetailPage() {
             onChange={(e) => setQuantity(Number(e.target.value))}
             className="w-16 border px-2 py-1 rounded bg-white border-[#2F2F2F] text-center"
           />
-          <button className="bg-[#2F2F2F] text-white px-6 py-2 rounded-3xl hover:opacity-90 text-lg cursor-pointer">
+          <button
+            onClick={() => dispatch({ type: "ADD_ITEM", payload: product })}
+            className="bg-[#2F2F2F] text-white px-6 py-2 rounded-3xl hover:opacity-90 text-lg cursor-pointer"
+          >
             Add to cart
           </button>
           <button className="border px-6 py-2 hover:bg-gray-100 bg-white text-lg rounded-3xl cursor-pointer">

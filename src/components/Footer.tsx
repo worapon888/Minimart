@@ -29,19 +29,19 @@ const footerLinks = [
 const contactInfo = [
   {
     icon: <MdEmail />,
-    text: "contact@company.com",
+    text: "Worapon@company.com",
   },
   {
     icon: <MdPhone />,
-    text: "(414) 687 - 5892",
+    text: "+66863699914",
   },
   {
     icon: <MdLocationOn />,
     text: (
       <>
-        794 Mcallister St
+        235 bangkea
         <br />
-        San Francisco, 94102
+        bangkok thailand, 10160
       </>
     ),
   },
