@@ -50,7 +50,7 @@ export default function Header() {
       {/* Logo */}
       <div className="flex items-center gap-1 text-xl font-semibold">
         <Link href="/">
-          <Image src="/logo.png" alt="logo" width={200} height={100} />
+          <Image src="/Logo.png" alt="logo" width={200} height={100} />
         </Link>
       </div>
 

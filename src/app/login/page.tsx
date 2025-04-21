@@ -83,7 +83,7 @@ export default function LoginPage() {
         {/* Sign in */}
         <button
           type="submit"
-          className="w-full bg-black text-white py-3 rounded-lg font-medium hover:opacity-90 transition"
+          className="w-full bg-black text-white py-3 rounded-lg font-medium hover:opacity-90 transition cursor-pointer"
         >
           Sign in
         </button>
@@ -99,7 +99,7 @@ export default function LoginPage() {
         <button
           type="button"
           onClick={() => signIn("google")}
-          className="w-full flex items-center justify-center gap-3 bg-white border border-gray-300 text-gray-800 font-medium py-2 rounded-lg hover:bg-gray-100 transition"
+          className="w-full flex items-center cursor-pointer justify-center gap-3 bg-white border border-gray-300 text-gray-800 font-medium py-2 rounded-lg hover:bg-gray-100 transition"
         >
           <Image
             src="https://img.icons8.com/?size=100&id=17949&format=png&color=000000"

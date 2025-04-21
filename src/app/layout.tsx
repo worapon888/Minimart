@@ -9,6 +9,9 @@ import PageTransitionWrapper from "@/components/PageTransitionWrapper"; // ✅ I
 export const metadata: Metadata = {
   title: "MinimalMart",
   description: "Minimal goods for maximal living",
+  icons: {
+    icon: "/favicon.png",
+  },
 };
 
 export default function RootLayout({
