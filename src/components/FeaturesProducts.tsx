@@ -1,7 +1,6 @@
 "use client";
 
 import { FaPlus } from "react-icons/fa";
-
 import Image from "next/image";
 import { Product } from "@/types/product";
 import { useEffect, useState } from "react";
@@ -10,12 +9,14 @@ import { motion } from "framer-motion";
 
 export default function FeaturesProducts() {
   const [products, setProducts] = useState<Product[]>([]);
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
+    setMounted(true);
+
     fetch("/api/products")
       .then((res) => res.json())
       .then((data) => {
-        // ถ้าใช้ mock แบบที่คุณมี ใช้ title → name
         const featured = data.slice(0, 4).map((item: Product) => ({
           id: item.id.toString(),
           title: item.title,
@@ -34,15 +35,17 @@ export default function FeaturesProducts() {
       <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
         {/* Progress Bar */}
         <div className="w-full lg:flex-1 h-[6px] bg-gray-300 relative rounded-full overflow-hidden">
-          <motion.div
-            className="absolute top-0 left-[-60%] h-full w-[60%] bg-gradient-to-r from-gray-700 via-gray-900 to-transparent opacity-70"
-            animate={{ x: "290%" }}
-            transition={{
-              duration: 3.5,
-              ease: "linear",
-              repeat: Infinity,
-            }}
-          />
+          {mounted && (
+            <motion.div
+              className="absolute top-0 left-[-60%] h-full w-[60%] bg-gradient-to-r from-gray-700 via-gray-900 to-transparent opacity-70"
+              animate={{ x: "290%" }}
+              transition={{
+                duration: 3.5,
+                ease: "linear",
+                repeat: Infinity,
+              }}
+            />
+          )}
         </div>
 
         {/* Header Text + Button */}
@@ -65,7 +68,6 @@ export default function FeaturesProducts() {
         {products.map((product, index) => {
           let spanClass = "";
 
-          // ✅ Layout ซับซ้อนเฉพาะบนจอใหญ่
           if (index === 0) {
             spanClass = "lg:col-span-2 lg:row-span-1";
           } else if (index === 1) {

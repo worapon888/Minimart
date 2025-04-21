@@ -9,8 +9,11 @@ import { motion } from "framer-motion";
 
 export default function CategoriesProducts() {
   const [categories, setCategories] = useState<Category[]>([]);
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
+    setMounted(true);
+
     fetch("/api/categories")
       .then((res) => res.json())
       .then((data: Category[]) => setCategories(data));
@@ -22,16 +25,19 @@ export default function CategoriesProducts() {
       <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
         {/* Progress Bar */}
         <div className="w-full lg:flex-1 h-[6px] bg-gray-300 relative rounded-full overflow-hidden">
-          <motion.div
-            className="absolute top-0 left-[-60%] h-full w-[60%] bg-gradient-to-r from-gray-700 via-gray-900 to-transparent opacity-70"
-            animate={{ x: "250%" }}
-            transition={{
-              duration: 3.5,
-              ease: "linear",
-              repeat: Infinity,
-            }}
-          />
+          {mounted && (
+            <motion.div
+              className="absolute top-0 left-[-60%] h-full w-[60%] bg-gradient-to-r from-gray-700 via-gray-900 to-transparent opacity-70"
+              animate={{ x: "250%" }}
+              transition={{
+                duration: 3.5,
+                ease: "linear",
+                repeat: Infinity,
+              }}
+            />
+          )}
         </div>
+
         {/* Title + Button */}
         <div className="flex items-center gap-2">
           <span className="font-medium text-2xl tracking-wide">
