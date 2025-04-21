@@ -10,7 +10,9 @@
 
   --screen-sm: 375px;
   --screen-md: 768px;
-  --screen-lg: 1200px;
+  --screen-lg: 1024px;
+  --screen-xl: 1280px;
+  --screen-2xl: 1536px;
 
   /* ✅ bind font-sans → gotham */
   --font-sans: var(--font-gotham), sans-serif;
@@ -51,6 +53,9 @@ body {
     padding-left: 4rem;
     padding-right: 4rem;
   }
+}
+html {
+  scroll-behavior: smooth;
 }
 
 .stroke-layer {

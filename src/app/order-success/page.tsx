@@ -6,7 +6,6 @@ import confetti from "canvas-confetti";
 
 export default function OrderSuccessPage() {
   useEffect(() => {
-    // ปล่อย confetti เมื่อโหลดหน้า
     confetti({
       particleCount: 150,
       spread: 80,
@@ -15,23 +14,26 @@ export default function OrderSuccessPage() {
   }, []);
 
   return (
-    <div className="min-h-screen flex flex-col justify-center items-center text-center bg-[#f9f9f9] px-4">
-      <h1 className="text-4xl font-semibold mb-2 text-gray-800">
+    <div className="min-h-screen flex flex-col justify-center items-center text-center bg-[#f9f9f9] px-4 sm:px-6 py-12 space-y-6">
+      <h1 className="text-3xl sm:text-4xl font-semibold text-gray-800">
         Order Confirmation
       </h1>
-      <p className="text-gray-600 mb-8">
-        Your order has been confirmed. A receipt has been sent to your email
+
+      <p className="text-base sm:text-lg text-gray-600 max-w-md">
+        Your order has been confirmed. A receipt has been sent to your email.
       </p>
 
       {/* Icon */}
-      <div className="text-5xl text-green-600 mb-6">✓</div>
+      <div className="text-6xl sm:text-7xl text-green-600">✓</div>
 
-      <h2 className="text-3xl font-bold mb-4 text-gray-900">Thank you</h2>
+      <h2 className="text-2xl sm:text-3xl font-bold text-gray-900">
+        Thank you
+      </h2>
 
       {/* Continue Shopping Button */}
       <Link
         href="/products"
-        className="inline-block bg-black text-white px-6 py-3 rounded-full hover:opacity-90 transition"
+        className="inline-block bg-black text-white px-6 py-3 rounded-full text-sm sm:text-base hover:opacity-90 transition"
       >
         Continue Shopping
       </Link>

@@ -5,6 +5,7 @@ import Link from "next/link";
 import { FaPlus } from "react-icons/fa";
 import { Category } from "@/types/product";
 import { useEffect, useState } from "react";
+import { motion } from "framer-motion";
 
 export default function CategoriesProducts() {
   const [categories, setCategories] = useState<Category[]>([]);
@@ -18,13 +19,23 @@ export default function CategoriesProducts() {
   return (
     <section className="py-12 px-6 space-y-12">
       {/* Section Header */}
-      <div className="flex items-center justify-between">
-        <div className="flex-1 h-[6px] bg-gray-300 relative mr-4 rounded-full overflow-hidden">
-          <div className="absolute top-0 right-0 h-full bg-gray-800 w-2/4" />
+      <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
+        {/* Progress Bar */}
+        <div className="w-full lg:flex-1 h-[6px] bg-gray-300 relative rounded-full overflow-hidden">
+          <motion.div
+            className="absolute top-0 left-[-60%] h-full w-[60%] bg-gradient-to-r from-gray-700 via-gray-900 to-transparent opacity-70"
+            animate={{ x: "250%" }}
+            transition={{
+              duration: 3.5,
+              ease: "linear",
+              repeat: Infinity,
+            }}
+          />
         </div>
+        {/* Title + Button */}
         <div className="flex items-center gap-2">
           <span className="font-medium text-2xl tracking-wide">
-            Features Products
+            Categories Products
           </span>
           <button className="w-14 h-14 flex items-center justify-center rounded-full bg-gray-300 text-lg text-gray-800 hover:bg-gray-400 transition">
             <FaPlus className="text-2xl" />

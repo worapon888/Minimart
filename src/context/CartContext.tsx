@@ -98,7 +98,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
           dispatch({ type: "ADD_ITEM", payload: item })
         );
       } catch (e) {
-        console.error("Invalid cart data in localStorage");
+        console.error("Invalid cart data in localStorage", e);
       }
     }
     setIsHydrated(true);

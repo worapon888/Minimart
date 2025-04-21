@@ -4,6 +4,7 @@ import { Gotham } from "@/app/fonts";
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
 import ClientProviders from "./ClientProviders";
+import PageTransitionWrapper from "@/components/PageTransitionWrapper"; // ✅ Import ที่นี่
 
 export const metadata: Metadata = {
   title: "MinimalMart",
@@ -20,7 +21,12 @@ export default function RootLayout({
       <body className="min-h-screen flex flex-col font-gotham">
         <ClientProviders>
           <Header />
-          <main className="pt-4 flex-grow">{children}</main>
+
+          {/* ✅ Wrap ด้วย PageTransitionWrapper */}
+          <PageTransitionWrapper>
+            <main className=" flex-grow">{children}</main>
+          </PageTransitionWrapper>
+
           <Footer />
         </ClientProviders>
       </body>

@@ -1,27 +1,29 @@
 // types/next-auth.d.ts
-import NextAuth from "next-auth";
+import "next-auth";
 
 declare module "next-auth" {
   interface Session {
     user: {
       id: string;
-      name: string;
-      email: string;
-      image?: string;
+      name?: string | null;
+      email?: string | null;
+      image?: string | null;
     };
   }
 
   interface User {
     id: string;
-    name: string;
-    email: string;
+    name?: string | null;
+    email?: string | null;
+    image?: string | null;
   }
 }
 
 declare module "next-auth/jwt" {
   interface JWT {
-    id: string;
-    name: string;
-    email: string;
+    id?: string;
+    name?: string;
+    email?: string;
+    picture?: string;
   }
 }

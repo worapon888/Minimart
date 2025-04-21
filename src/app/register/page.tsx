@@ -18,7 +18,7 @@ export default function RegisterPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // 🔐 ในระบบจริง ต้องเชื่อมกับ backend หรือ database
+    // 🔐 ต้องเชื่อม backend จริงในระบบ production
     setSubmitted(true);
 
     setTimeout(() => {
@@ -27,20 +27,22 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4">
+    <div className="min-h-screen flex items-center justify-center px-4 sm:px-6">
       <form
         onSubmit={handleSubmit}
-        className="bg-white w-full max-w-md rounded-2xl p-20 shadow-md space-y-6"
+        className="bg-white w-full max-w-md sm:rounded-2xl sm:shadow-md px-6 py-12 sm:p-16 space-y-8"
       >
-        <div className="space-y-1 text-center">
-          <h1 className="text-3xl font-bold text-left text-gray-900">
+        {/* Header */}
+        <div className="space-y-1">
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
             Create account
           </h1>
-          <p className="text-sm text-gray-500 text-left">
+          <p className="text-sm text-gray-500">
             Get started with your shopping journey
           </p>
         </div>
 
+        {/* Inputs */}
         <div className="space-y-4">
           {/* Name */}
           <div className="relative">
@@ -90,11 +92,12 @@ export default function RegisterPage() {
             <FiLock className="absolute top-3.5 left-3 text-gray-400" />
           </div>
         </div>
-        {/* Google */}
+
+        {/* Google Sign-in */}
         <button
           type="button"
           onClick={() => signIn("google")}
-          className="w-full flex cursor-pointer items-center justify-center gap-3 bg-white border border-gray-300 text-gray-800 font-medium py-2 rounded-lg hover:bg-gray-100 transition"
+          className="w-full flex items-center justify-center gap-3 bg-white border border-gray-300 text-gray-800 font-medium py-2 rounded-lg hover:bg-gray-100 transition"
         >
           <Image
             src="https://img.icons8.com/?size=100&id=17949&format=png&color=000000"
@@ -105,13 +108,16 @@ export default function RegisterPage() {
           />
           Continue with Google
         </button>
+
+        {/* Submit */}
         <button
           type="submit"
-          className="w-full bg-[#333333] text-white py-3 rounded-lg font-medium hover:opacity-90 transition"
+          className="w-full bg-black text-white py-3 rounded-lg font-medium hover:opacity-90 transition"
         >
           {submitted ? "Creating account..." : "Register"}
         </button>
 
+        {/* Link to Login */}
         <p className="text-center text-sm text-gray-500">
           Already have an account?{" "}
           <span

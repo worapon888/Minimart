@@ -21,7 +21,7 @@ export const HeroImage = [
 export const logos = [
   { name: "Swiss", image: "/logo/logo_thicker1_1.png" },
   { name: "Seiko", image: "/logo/logo_thicker2_2.png" },
-  { name: "Polo", image: "/logo/logo_thicker3.png" },
+  { name: "Polo", image: "/logo/logo_thicker3_3.png" },
   { name: "Shu", image: "/logo/logo_thicker4_4.png" },
   { name: "Vans", image: "/logo/logo_thicker5_5.png" },
   { name: "Nike", image: "/logo/logo_thicker6_6.png" },

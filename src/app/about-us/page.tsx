@@ -1,18 +1,17 @@
 "use client";
-
 export default function AboutUsPage() {
   return (
-    <section className="px-6 py-16 max-w-4xl mx-auto text-center space-y-10">
+    <section className="px-6 py-16 max-w-5xl mx-auto text-center space-y-12">
       {/* Heading */}
       <div>
-        <h2 className="text-4xl font-semibold mb-4">About Us</h2>
-        <p className="text-lg text-gray-700">
+        <h2 className="text-3xl sm:text-4xl font-semibold mb-4">About Us</h2>
+        <p className="text-base sm:text-lg text-gray-700">
           Your simple choice for everyday style.
         </p>
       </div>
 
       {/* Brand Philosophy */}
-      <p className="text-gray-600 leading-8">
+      <p className="text-gray-600 leading-relaxed text-base sm:text-lg">
         At <strong>MinimalMart</strong>, we believe that{" "}
         <em>“less is more.”</em>
         <br />
@@ -22,23 +21,23 @@ export default function AboutUsPage() {
       </p>
 
       {/* Core Values */}
-      <div className="grid md:grid-cols-3 gap-8 text-left">
+      <div className="grid gap-8 text-left sm:grid-cols-2 lg:grid-cols-3">
         <div>
           <h4 className="font-semibold text-xl mb-2">🤍 Minimal Design</h4>
-          <p className="text-gray-600">
+          <p className="text-gray-600 text-base sm:text-lg">
             Clean, calming, and easy to navigate — no clutter, no stress.
           </p>
         </div>
         <div>
           <h4 className="font-semibold text-xl mb-2">🔧 Function First</h4>
-          <p className="text-gray-600">
+          <p className="text-gray-600 text-base sm:text-lg">
             It&apos;s not just about aesthetics — it&apos;s about usability and
             quality that lasts.
           </p>
         </div>
         <div>
           <h4 className="font-semibold text-xl mb-2">🫶 Customer-Centered</h4>
-          <p className="text-gray-600">
+          <p className="text-gray-600 text-base sm:text-lg">
             We listen. Your feedback shapes our store and inspires every
             decision we make.
           </p>
@@ -47,8 +46,10 @@ export default function AboutUsPage() {
 
       {/* Mission */}
       <div>
-        <h4 className="text-2xl font-semibold mb-2">🛍️ Our Mission</h4>
-        <p className="text-gray-600">
+        <h4 className="text-xl sm:text-2xl font-semibold mb-2">
+          🛍️ Our Mission
+        </h4>
+        <p className="text-gray-600 text-base sm:text-lg">
           To simplify your shopping experience — one meaningful product at a
           time.
         </p>
@@ -56,17 +57,19 @@ export default function AboutUsPage() {
 
       {/* Location */}
       <div>
-        <h4 className="text-2xl font-semibold mb-2">📍 Based in Thailand</h4>
-        <p className="text-gray-600">
+        <h4 className="text-xl sm:text-2xl font-semibold mb-2">
+          📍 Based in Thailand
+        </h4>
+        <p className="text-gray-600 text-base sm:text-lg">
           We ship nationwide and are always expanding our reach.
         </p>
       </div>
 
       {/* Thank You */}
-      <blockquote className="text-gray-700 italic border-l-4 border-gray-400 pl-4">
+      <blockquote className="text-gray-700 italic border-l-4 border-gray-400 pl-4 text-left text-base sm:text-lg">
         Thank you for supporting an independent brand with intention and care.
         <br />
-        <span className="not-italic font-semibold">
+        <span className="not-italic font-semibold block mt-2">
           MinimalMart — the calm side of commerce.
         </span>
       </blockquote>

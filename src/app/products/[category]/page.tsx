@@ -6,6 +6,7 @@ import { Product } from "@/types/product";
 import Image from "next/image";
 import Link from "next/link";
 import { useCart } from "@/context/CartContext";
+import { ImSpinner2 } from "react-icons/im";
 
 export default function CategoryPage() {
   const { category } = useParams();
@@ -35,7 +36,9 @@ export default function CategoryPage() {
       </h1>
 
       {loading ? (
-        <p className="text-center text-gray-500">Loading...</p>
+        <div className="flex justify-center items-center py-16">
+          <ImSpinner2 className="animate-spin text-4xl text-gray-500" />
+        </div>
       ) : products.length === 0 ? (
         <p className="text-center text-gray-500">No products found.</p>
       ) : (

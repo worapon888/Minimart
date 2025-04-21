@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { products as allProducts } from "@/data/products";
 import { Product } from "@/types/product";
 import Image from "next/image";
@@ -15,47 +15,40 @@ export default function ProductsPage() {
   const [priceRange, setPriceRange] = useState<[number, number]>([10, 1000]);
   const { dispatch } = useCart();
 
+  const searchParams = useSearchParams();
+  const search = searchParams.get("search")?.toLowerCase() || "";
+
   useEffect(() => {
     setProducts(allProducts);
     setFiltered(allProducts);
   }, []);
 
-  const searchParams = useSearchParams();
-  const search = searchParams.get("search")?.toLowerCase() || "";
-
-  const handleFilter = () => {
+  const handleFilter = useCallback(() => {
     let result = products;
 
-    // Search filter
     if (search) {
       result = result.filter((p) => p.title.toLowerCase().includes(search));
     }
 
-    // Category filter
     if (category !== "All") {
       result = result.filter((p) => p.category === category);
     }
 
-    // Price filter
     result = result.filter(
       (p) => p.price >= priceRange[0] && p.price <= priceRange[1]
     );
 
     setFiltered(result);
-  };
+  }, [search, category, priceRange, products]);
+
+  useEffect(() => {
+    handleFilter();
+  }, [handleFilter]);
 
   const uniqueCategories = [
     "All",
     ...Array.from(new Set(allProducts.map((p) => p.category))),
   ];
-
-  useEffect(() => {
-    setProducts(allProducts);
-  }, []);
-
-  useEffect(() => {
-    handleFilter();
-  }, [search, category, priceRange, products]);
 
   const handleClear = () => {
     setCategory("All");
@@ -65,20 +58,15 @@ export default function ProductsPage() {
 
   return (
     <div className="container mx-auto px-6 py-12 grid md:grid-cols-4 gap-15">
-      {/* Sidebar */}
       <aside className="md:col-span-1 space-y-6">
         <h3 className="text-2xl font-semibold">Categories</h3>
 
-        {/* Price Filter */}
         <div className="space-y-4">
           <label className="text-lg font-medium">Price</label>
 
-          {/* Slider */}
           <div className="relative w-full h-4 flex items-center ">
-            {/* Track */}
             <div className="absolute w-full h-1 bg-[#8E8E8E] rounded" />
 
-            {/* Min Range */}
             <input
               type="range"
               min={10}
@@ -100,7 +88,6 @@ export default function ProductsPage() {
         [&::-moz-range-thumb]:bg-black"
             />
 
-            {/* Max Range */}
             <input
               type="range"
               min={10}
@@ -123,13 +110,11 @@ export default function ProductsPage() {
             />
           </div>
 
-          {/* Labels under slider */}
           <div className="flex justify-between text-lg text-gray-600">
             <span>Min</span>
             <span>Max</span>
           </div>
 
-          {/* Display value */}
           <div className="text-right">
             <p className="text-lg">
               Price: <span className="font-medium">${priceRange[0]}</span> -{" "}
@@ -138,7 +123,6 @@ export default function ProductsPage() {
           </div>
         </div>
 
-        {/* Category Filter */}
         <div className="space-x-5">
           <label className="text-lg font-medium">Categories</label>
           <select
@@ -170,7 +154,6 @@ export default function ProductsPage() {
         </div>
       </aside>
 
-      {/* Product Grid */}
       <main className="md:col-span-3">
         <div className="mb-6">
           <p className="text-sm text-gray-600">

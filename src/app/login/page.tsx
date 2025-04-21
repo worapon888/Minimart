@@ -30,19 +30,17 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center  px-4">
+    <div className="min-h-screen flex items-center justify-center px-4 sm:px-6">
       <form
         onSubmit={handleSubmit}
-        className="bg-white w-full max-w-md rounded-2xl p-20 shadow-md space-y-6"
+        className="bg-white w-full max-w-md sm:rounded-2xl sm:shadow-md px-6 py-12 sm:p-16 space-y-8"
       >
         {/* Header */}
-        <div className="space-y-1 text-center">
-          <h1 className="text-3xl font-bold text-gray-900 text-left">
+        <div className="space-y-1">
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
             Sign in
           </h1>
-          <p className="text-sm text-gray-500 text-left">
-            Sign in to continue shopping
-          </p>
+          <p className="text-sm text-gray-500">Sign in to continue shopping</p>
         </div>
 
         {/* Inputs */}
@@ -85,7 +83,7 @@ export default function LoginPage() {
         {/* Sign in */}
         <button
           type="submit"
-          className="w-full bg-[#333333] text-white py-3 rounded-lg font-medium hover:opacity-90 transition"
+          className="w-full bg-black text-white py-3 rounded-lg font-medium hover:opacity-90 transition"
         >
           Sign in
         </button>
@@ -101,7 +99,7 @@ export default function LoginPage() {
         <button
           type="button"
           onClick={() => signIn("google")}
-          className="w-full flex cursor-pointer items-center justify-center gap-3 bg-white border border-gray-300 text-gray-800 font-medium py-2 rounded-lg hover:bg-gray-100 transition"
+          className="w-full flex items-center justify-center gap-3 bg-white border border-gray-300 text-gray-800 font-medium py-2 rounded-lg hover:bg-gray-100 transition"
         >
           <Image
             src="https://img.icons8.com/?size=100&id=17949&format=png&color=000000"
@@ -114,14 +112,15 @@ export default function LoginPage() {
         </button>
 
         {/* Register link */}
-        <Link href={"/register"}>
-          <p className="text-center text-sm text-gray-500">
-            Don&apos;t have an account?{" "}
-            <span className="text-blue-600 hover:underline cursor-pointer">
-              register
-            </span>
-          </p>
-        </Link>
+        <p className="text-center text-sm text-gray-500">
+          Don&apos;t have an account?{" "}
+          <Link
+            href="/register"
+            className="text-blue-600 hover:underline cursor-pointer"
+          >
+            Register
+          </Link>
+        </p>
       </form>
     </div>
   );
