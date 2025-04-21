@@ -8,18 +8,26 @@ import FeaturesProducts from "@/components/FeaturesProducts";
 import CategoriesProducts from "@/components/CategoreisProducts";
 import WhyMinimalMart from "@/components/WhyMinimalMart";
 import { motion } from "framer-motion";
+import { useEffect, useState } from "react";
 
 export default function Hero() {
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   return (
     <section className="w-full py-10 container">
-      <div className=" max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-center gap-16 px-6">
+      <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-center gap-16 px-6">
         {/* Section A: Image Grid */}
         <div className="grid grid-cols-[1fr_1.2fr] grid-rows-2 gap-6 w-full max-w-5xl">
           {/* Sneaker */}
           <motion.div
-            animate={{
-              scale: [0, 1, 1.015, 1, 1.015, 1],
-            }}
+            initial={{ scale: 0 }}
+            animate={
+              mounted ? { scale: [0, 1, 1.015, 1, 1.015, 1] } : { scale: 0 }
+            }
             transition={{
               duration: 4,
               ease: "easeInOut",
@@ -38,10 +46,15 @@ export default function Hero() {
               priority
             />
             <motion.div
-              animate={{
-                scale: [0, 1, 1.015, 1, 1.015, 1],
-                opacity: [0, 1, 1, 1, 1, 1],
-              }}
+              initial={{ scale: 0, opacity: 0 }}
+              animate={
+                mounted
+                  ? {
+                      scale: [0, 1, 1.015, 1, 1.015, 1],
+                      opacity: [0, 1, 1, 1, 1, 1],
+                    }
+                  : { scale: 0, opacity: 0 }
+              }
               transition={{
                 duration: 4,
                 ease: "easeInOut",
@@ -69,16 +82,17 @@ export default function Hero() {
 
           {/* Watch */}
           <motion.div
-            animate={{
-              scale: [0, 1, 1.015, 1, 1.015, 1],
-            }}
+            initial={{ scale: 0 }}
+            animate={
+              mounted ? { scale: [0, 1, 1.015, 1, 1.015, 1] } : { scale: 0 }
+            }
             transition={{
               duration: 4,
               ease: "easeInOut",
               times: [0, 0.3, 0.4, 0.6, 0.7, 1],
               repeat: Infinity,
               repeatType: "reverse",
-              delay: 1.2, // ลื่นถัดจาก sneaker
+              delay: 1.2,
             }}
             className="relative rounded-xl overflow-hidden aspect-[5/4] w-full"
           >
@@ -89,10 +103,15 @@ export default function Hero() {
               className="object-cover"
             />
             <motion.div
-              animate={{
-                scale: [0, 1, 1.015, 1, 1.015, 1],
-                opacity: [0, 1, 1, 1, 1, 1],
-              }}
+              initial={{ scale: 0, opacity: 0 }}
+              animate={
+                mounted
+                  ? {
+                      scale: [0, 1, 1.015, 1, 1.015, 1],
+                      opacity: [0, 1, 1, 1, 1, 1],
+                    }
+                  : { scale: 0, opacity: 0 }
+              }
               transition={{
                 duration: 4,
                 ease: "easeInOut",
@@ -112,16 +131,17 @@ export default function Hero() {
 
           {/* Guy */}
           <motion.div
-            animate={{
-              scale: [0, 1, 1.015, 1, 1.015, 1],
-            }}
+            initial={{ scale: 0 }}
+            animate={
+              mounted ? { scale: [0, 1, 1.015, 1, 1.015, 1] } : { scale: 0 }
+            }
             transition={{
               duration: 4,
               ease: "easeInOut",
               times: [0, 0.3, 0.4, 0.6, 0.7, 1],
               repeat: Infinity,
               repeatType: "reverse",
-              delay: 1.8, // ลื่นต่อจาก watch
+              delay: 1.8,
             }}
             className="relative rounded-xl overflow-hidden aspect-[4/3] w-full"
           >
@@ -132,17 +152,22 @@ export default function Hero() {
               className="object-cover"
             />
             <motion.div
-              animate={{
-                scale: [0, 1, 1.015, 1, 1.015, 1],
-                opacity: [0, 1, 1, 1, 1, 1],
-              }}
+              initial={{ scale: 0, opacity: 0 }}
+              animate={
+                mounted
+                  ? {
+                      scale: [0, 1, 1.015, 1, 1.015, 1],
+                      opacity: [0, 1, 1, 1, 1, 1],
+                    }
+                  : { scale: 0, opacity: 0 }
+              }
               transition={{
-                duration: 4, // ⏱ ให้เท่ากับ motion box
+                duration: 4,
                 ease: "easeInOut",
                 times: [0, 0.3, 0.4, 0.6, 0.7, 1],
                 repeat: Infinity,
                 repeatType: "reverse",
-                delay: 2.1, // ⏱ มาหลัง box เล็กน้อย
+                delay: 2.1,
               }}
               className="absolute bottom-1 right-1 text-black text-sm font-medium text-right px-3 py-2 rounded-md backdrop-blur-sm"
             >
@@ -153,10 +178,8 @@ export default function Hero() {
           </motion.div>
         </div>
 
-        {/* Section B: Text + CTA */}
+        {/* Section B */}
         <motion.div
-          initial="hidden"
-          animate="visible"
           variants={{
             hidden: {},
             visible: {
@@ -165,9 +188,10 @@ export default function Hero() {
               },
             },
           }}
+          initial="hidden"
+          animate={mounted ? "visible" : "hidden"}
           className="flex items-center justify-center flex-col md:text-left w-full max-w-md space-y-8"
         >
-          {/* Headline */}
           <motion.h2
             variants={{
               hidden: { opacity: 0, y: 40 },
@@ -182,7 +206,6 @@ export default function Hero() {
             </span>
           </motion.h2>
 
-          {/* Subtext */}
           <motion.p
             variants={{
               hidden: { opacity: 0, y: 30 },
@@ -193,7 +216,7 @@ export default function Hero() {
           >
             Minimal goods for maximal living
           </motion.p>
-          {/* CTA Button */}
+
           <motion.div
             variants={{
               hidden: { opacity: 0, scale: 0.95 },
