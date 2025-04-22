@@ -77,12 +77,11 @@ export default function CheckoutPage() {
   return (
     <>
       <h1 className="text-4xl font-semibold mb-8 text-center">Checkout</h1>
-      <div className="max-w-6xl mx-auto p-8 bg-white rounded-lg">
+      <div className="max-w-6xl mx-auto px-4 py-8 bg-white rounded-lg">
         {/* Product table */}
         <div className="w-full mb-10">
-          <div className="grid grid-cols-4 font-semibold border-b border-[#E5E5E5]  pb-3">
-            <span className="pl-16">Product</span>{" "}
-            {/* << ขยับเฉพาะหัว product ให้ตรงกับเนื้อหา */}
+          <div className="hidden md:grid grid-cols-4 font-semibold border-b border-[#E5E5E5] pb-3">
+            <span className="pl-16">Product</span>
             <span className="text-center">Price</span>
             <span className="text-center">Quantity</span>
             <span className="text-center">Subtotal</span>
@@ -91,22 +90,20 @@ export default function CheckoutPage() {
           {state.items.map((item) => (
             <div
               key={item.id}
-              className="grid grid-cols-4 items-center border-b border-[#E5E5E5] py-4 text-sm"
+              className="md:grid md:grid-cols-4 border-b border-[#E5E5E5] py-4 text-sm flex flex-col gap-4"
             >
               {/* Product Column */}
-              <div className="relative flex items-start gap-4 pl-10">
-                {/* ❌ Remove Button */}
+              <div className="relative flex items-start gap-4 pl-2 md:pl-10">
                 <button
                   onClick={() =>
                     dispatch({ type: "REMOVE_ITEM", payload: item.id })
                   }
-                  className="absolute -left-5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-red-500 cursor-pointer"
+                  className="absolute -left-5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-red-500 md:relative md:top-auto md:translate-y-0"
                   title="Remove item"
                 >
-                  <CiCircleRemove className="text-2xl" />
+                  <CiCircleRemove className="text-2xl cursor-pointer" />
                 </button>
 
-                {/* Image */}
                 <Image
                   src={item.image}
                   alt={item.title}
@@ -115,17 +112,18 @@ export default function CheckoutPage() {
                   className="rounded"
                 />
 
-                {/* Info (name + price) */}
-                <div className="flex flex-col pl-10">
+                <div className="flex flex-col">
                   <span className="font-medium leading-snug">{item.title}</span>
                 </div>
               </div>
 
-              {/* Price */}
-              <div className="text-center">${item.price.toFixed(2)}</div>
+              <div className="text-center md:text-center">
+                <span className="block md:hidden text-gray-500">Price</span>$
+                {item.price.toFixed(2)}
+              </div>
 
-              {/* Quantity */}
-              <div className="text-center">
+              <div className="text-center md:text-center">
+                <span className="block md:hidden text-gray-500">Qty</span>
                 <input
                   type="number"
                   min={1}
@@ -143,9 +141,9 @@ export default function CheckoutPage() {
                 />
               </div>
 
-              {/* Subtotal */}
-              <div className="text-center">
-                ${(item.price * item.quantity).toFixed(2)}
+              <div className="text-center md:text-center">
+                <span className="block md:hidden text-gray-500">Subtotal</span>$
+                {(item.price * item.quantity).toFixed(2)}
               </div>
             </div>
           ))}

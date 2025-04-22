@@ -39,9 +39,8 @@ const contactInfo = [
     icon: <MdLocationOn />,
     text: (
       <>
-        235 bangkea
-        <br />
-        bangkok thailand, 10160
+        235 Bangkhae,
+        <br /> Bangkok, Thailand 10160
       </>
     ),
   },
@@ -56,70 +55,70 @@ const socialIcons = [
 export default function Footer() {
   return (
     <footer className="bg-[#DCDBDB] text-gray-800">
-      <div className="max-w-7xl mx-auto px-6 py-12 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-8">
-        {/* Logo & Social */}
-        <div className="space-y-6 col-span-1 md:col-span-1">
-          <Image src="/Logo.png" alt="logo" width={200} height={100} />
-          <div className="flex gap-4 text-xl">
-            {socialIcons.map((s, i) => {
-              const iconColor =
-                s.label === "Facebook"
-                  ? "text-blue-600"
-                  : s.label === "Twitter"
-                  ? "text-black"
-                  : "text-gray-800";
-
-              return (
-                <span
-                  key={i}
-                  className={`text-2xl transition cursor-pointer hover:opacity-80 ${iconColor}`}
-                  title={s.label}
-                >
-                  {s.icon}
-                </span>
-              );
-            })}
+      <div className="max-w-7xl mx-auto px-6 py-16 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-10">
+        {/* Logo + Social */}
+        <div className="space-y-6">
+          <Image src="/Logo.png" alt="logo" width={160} height={80} />
+          <div className="flex gap-4">
+            {socialIcons.map((s, i) => (
+              <span
+                key={i}
+                className="text-2xl hover:scale-110 hover:opacity-80 transition-transform"
+                title={s.label}
+              >
+                {s.icon}
+              </span>
+            ))}
           </div>
         </div>
 
-        {/* Footer Link Groups */}
-        {footerLinks.map((group) => (
-          <div key={group.title}>
-            <h3 className="font-medium text-lg mb-4">{group.title}</h3>
-            <ul className="space-y-3 text-sm">
-              {group.links.map((link) => (
-                <li key={link} className="hover:underline cursor-pointer">
-                  {link}
-                </li>
-              ))}
-            </ul>
-          </div>
-        ))}
-
-        {/* Contact Info */}
+        {/* Product */}
         <div>
-          <h3 className="font-medium text-lg mb-4">Contacts us</h3>
+          <h3 className="font-semibold text-lg mb-4">Product</h3>
+          <ul className="space-y-2 text-sm">
+            {footerLinks[0].links.map((link) => (
+              <li key={link} className="hover:underline cursor-pointer">
+                {link}
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        {/* Company */}
+        <div>
+          <h3 className="font-semibold text-lg mb-4">Company</h3>
+          <ul className="space-y-2 text-sm">
+            {footerLinks[1].links.map((link) => (
+              <li key={link} className="hover:underline cursor-pointer">
+                {link}
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        {/* Contact (รวม Support ไว้ด้วยถ้าจะแน่นมากไป) */}
+        <div>
+          <h3 className="font-semibold text-lg mb-4">Contact Us</h3>
           <ul className="space-y-3 text-sm">
             {contactInfo.map((item, index) => (
-              <li key={index} className="flex items-start gap-2 ">
-                <span className="text-xl">{item.icon}</span>
-                <span className="text-sm">{item.text}</span>
+              <li key={index} className="flex gap-3 items-start">
+                <span className="text-xl mt-1">{item.icon}</span>
+                <span>{item.text}</span>
               </li>
             ))}
           </ul>
         </div>
       </div>
 
-      {/* Bottom */}
-      <div className="bg-gray-100 py-4 text-center text-sm px-6">
+      <div className="bg-gray-100 py-5 text-center text-sm px-6">
         <p>
-          Copyright © 2025 <strong>Code_404</strong> | All Rights Reserved |{" "}
-          <a href="#" className="text-indigo-600 hover:underline">
-            Terms and Conditions
+          &copy; 2025 <strong>Code_404</strong> | All Rights Reserved |
+          <a href="#" className="text-indigo-600 hover:underline mx-1">
+            Terms
           </a>{" "}
-          |{" "}
-          <a href="#" className="text-indigo-600 hover:underline">
-            Privacy Policy
+          |
+          <a href="#" className="text-indigo-600 hover:underline mx-1">
+            Privacy
           </a>
         </p>
       </div>

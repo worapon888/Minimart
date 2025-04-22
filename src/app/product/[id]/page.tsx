@@ -1,10 +1,13 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useParams } from "next/navigation";
 import { Product } from "@/types/product";
 import { useCart } from "@/context/CartContext";
+import gsap from "gsap";
+import { FaShoppingCart } from "react-icons/fa";
+import Link from "next/link";
 
 const sizes = ["S", "M", "L", "XL", "2XL"];
 
@@ -14,6 +17,16 @@ export default function ProductDetailPage() {
   const [selectedSize, setSelectedSize] = useState("M");
   const [quantity, setQuantity] = useState(1);
   const { dispatch } = useCart();
+  const cartCount = useCart().state.items.reduce(
+    (total, item) => total + item.quantity,
+    0
+  );
+
+  // 🌀 Refs for animation
+  const imageRef = useRef(null);
+  const infoRef = useRef(null);
+  const buttonsRef = useRef(null);
+  const cartIconRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     fetch("/api/products")
@@ -24,6 +37,41 @@ export default function ProductDetailPage() {
       });
   }, [id]);
 
+  // 🎞 GSAP Motion
+  useEffect(() => {
+    if (product) {
+      gsap.fromTo(
+        imageRef.current,
+        { opacity: 0, scale: 0.95, y: 30 },
+        { opacity: 1, scale: 1, y: 0, duration: 1, ease: "power3.out" }
+      );
+      gsap.fromTo(
+        infoRef.current,
+        { opacity: 0, y: 40 },
+        { opacity: 1, y: 0, duration: 1, delay: 0.3, ease: "power3.out" }
+      );
+      gsap.fromTo(
+        buttonsRef.current,
+        { opacity: 0, y: 20 },
+        { opacity: 1, y: 0, duration: 0.8, delay: 0.6, ease: "power2.out" }
+      );
+    }
+  }, [product]);
+
+  useEffect(() => {
+    const updatePosition = () => {
+      const icon = cartIconRef.current;
+      if (!icon) return;
+
+      icon.style.transform = `translateY(${window.scrollY}px)`;
+    };
+
+    window.addEventListener("scroll", updatePosition);
+    updatePosition();
+
+    return () => window.removeEventListener("scroll", updatePosition);
+  }, []);
+
   if (!product)
     return (
       <div className="flex justify-center items-center h-screen">
@@ -32,10 +80,13 @@ export default function ProductDetailPage() {
     );
 
   return (
-    <section className="container mx-auto p-6 grid grid-cols-1 md:grid-cols-2 gap-10 ">
+    <section className="container mx-auto p-6 grid grid-cols-1 md:grid-cols-2 gap-10">
       {/* Left - Images */}
-      <div className="h-[600px] bg-white rounded-3xl group">
-        <div className="relative w-full h-[600px] bg-white rounded-xl overflow-hidden flex justify-center items-center">
+      <div
+        ref={imageRef}
+        className="h-[600px] bg-white rounded-3xl group overflow-hidden"
+      >
+        <div className="relative w-full h-[600px] flex justify-center items-center">
           <Image
             src={product.image || "/product/main.jpg"}
             alt={product.title}
@@ -44,25 +95,10 @@ export default function ProductDetailPage() {
             className="object-center object-contain transition-transform duration-300 ease-in-out group-hover:scale-105"
           />
         </div>
-        {/* <div className="flex gap-3 mt-4">
-          {[1, 2, 3, 4].map((i) => (
-            <div
-              key={i}
-              className="w-20 h-20 relative rounded-lg overflow-hidden"
-            >
-              <Image
-                src={`/product/thumb${i}.jpg`}
-                alt={`Thumbnail ${i}`}
-                fill
-                className="object-center object-contain"
-              />
-            </div>
-          ))}
-        </div> */}
       </div>
 
       {/* Right - Info */}
-      <div className=" my-10">
+      <div ref={infoRef} className="my-10">
         <p className="text-sm text-gray-500 mb-3">
           <a href="#" className="underline hover:text-black">
             T-Shirt
@@ -79,7 +115,7 @@ export default function ProductDetailPage() {
 
         <div className="mt-6">
           <p className="text-xl font-medium mb-1">Size</p>
-          <div className="flex gap-2">
+          <div className="flex gap-2 flex-wrap">
             {sizes.map((size) => (
               <button
                 key={size}
@@ -94,7 +130,10 @@ export default function ProductDetailPage() {
           </div>
         </div>
 
-        <div className="flex items-center gap-4 mt-6">
+        <div
+          ref={buttonsRef}
+          className="flex items-center gap-4 mt-6 flex-wrap"
+        >
           <input
             type="number"
             min={1}
@@ -112,6 +151,21 @@ export default function ProductDetailPage() {
             View cart
           </button>
         </div>
+      </div>
+      {/* Floating Cart Icon */}
+      <div ref={cartIconRef} className="absolute top-4 right-4 z-50">
+        <Link href="/checkout">
+          <div className="relative">
+            <div className="bg-white shadow-lg rounded-full p-3">
+              <FaShoppingCart className="text-xl text-gray-700" />
+            </div>
+            {cartCount > 0 && (
+              <div className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-xs flex items-center justify-center rounded-full">
+                {cartCount}
+              </div>
+            )}
+          </div>
+        </Link>
       </div>
     </section>
   );

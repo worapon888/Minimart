@@ -65,7 +65,7 @@ export default function PageTransitionWrapper({
   }, [key, direction]);
 
   return (
-    <div key={key} ref={wrapperRef} className="w-full">
+    <div key={key} ref={wrapperRef} className="w-full flex-grow min-h-full">
       {children}
     </div>
   );

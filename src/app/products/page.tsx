@@ -13,6 +13,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useCart } from "@/context/CartContext";
 import { useSearchParams } from "next/navigation";
+import { FaShoppingCart } from "react-icons/fa";
 import gsap from "gsap";
 
 export default function ProductsPage() {
@@ -20,12 +21,13 @@ export default function ProductsPage() {
   const [filtered, setFiltered] = useState<Product[]>([]);
   const [category, setCategory] = useState("All");
   const [priceRange, setPriceRange] = useState<[number, number]>([10, 1000]);
-  const { dispatch } = useCart();
+  const { state, dispatch } = useCart();
 
   const searchParams = useSearchParams();
   const search = searchParams.get("search")?.toLowerCase() || "";
 
   const cardsRef = useRef<(HTMLDivElement | null)[]>([]);
+  const cartIconRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     setProducts(allProducts);
@@ -69,8 +71,7 @@ export default function ProductsPage() {
         yoyo: true,
         stagger: {
           each: 0.02,
-
-          from: "start", // หรือลอง "center" ถ้าอยากให้เด้งจากตรงกลาง
+          from: "start",
         },
         clearProps: "transform",
       });
@@ -79,16 +80,35 @@ export default function ProductsPage() {
     return () => ctx.revert();
   }, [filtered]);
 
-  const uniqueCategories = [
-    "All",
-    ...Array.from(new Set(allProducts.map((p) => p.category))),
-  ];
+  useEffect(() => {
+    const updatePosition = () => {
+      const icon = cartIconRef.current;
+      if (!icon) return;
+
+      const scrollY = window.scrollY;
+      icon.style.transform = `translateY(${scrollY}px)`;
+    };
+
+    window.addEventListener("scroll", updatePosition);
+    updatePosition();
+    return () => window.removeEventListener("scroll", updatePosition);
+  }, []);
 
   const handleClear = () => {
     setCategory("All");
     setPriceRange([10, 1000]);
     setFiltered(products);
   };
+
+  const cartCount = state.items.reduce(
+    (total, item) => total + item.quantity,
+    0
+  );
+
+  const uniqueCategories = [
+    "All",
+    ...Array.from(new Set(allProducts.map((p) => p.category))),
+  ];
 
   return (
     <div className="container mx-auto px-6 py-12 grid md:grid-cols-4 gap-15">
@@ -113,13 +133,13 @@ export default function ProductsPage() {
                 ])
               }
               className="absolute w-full pointer-events-none appearance-none bg-transparent cursor-pointer
-        [&::-webkit-slider-thumb]:appearance-none
-        [&::-webkit-slider-thumb]:w-4
-        [&::-webkit-slider-thumb]:h-4
-        [&::-webkit-slider-thumb]:bg-black
-        [&::-webkit-slider-thumb]:rounded-full
-        [&::-webkit-slider-thumb]:pointer-events-auto
-        [&::-moz-range-thumb]:bg-black"
+              [&::-webkit-slider-thumb]:appearance-none
+              [&::-webkit-slider-thumb]:w-4
+              [&::-webkit-slider-thumb]:h-4
+              [&::-webkit-slider-thumb]:bg-black
+              [&::-webkit-slider-thumb]:rounded-full
+              [&::-webkit-slider-thumb]:pointer-events-auto
+              [&::-moz-range-thumb]:bg-black"
             />
 
             <input
@@ -134,13 +154,13 @@ export default function ProductsPage() {
                 ])
               }
               className="absolute w-full pointer-events-none cursor-pointer appearance-none bg-transparent
-        [&::-webkit-slider-thumb]:appearance-none
-        [&::-webkit-slider-thumb]:w-4
-        [&::-webkit-slider-thumb]:h-4
-        [&::-webkit-slider-thumb]:bg-black
-        [&::-webkit-slider-thumb]:rounded-full
-        [&::-webkit-slider-thumb]:pointer-events-auto
-        [&::-moz-range-thumb]:bg-black"
+              [&::-webkit-slider-thumb]:appearance-none
+              [&::-webkit-slider-thumb]:w-4
+              [&::-webkit-slider-thumb]:h-4
+              [&::-webkit-slider-thumb]:bg-black
+              [&::-webkit-slider-thumb]:rounded-full
+              [&::-webkit-slider-thumb]:pointer-events-auto
+              [&::-moz-range-thumb]:bg-black"
             />
           </div>
 
@@ -211,8 +231,11 @@ export default function ProductsPage() {
              ease-[cubic-bezier(0.25,0.8,0.25,1)]
              hover:scale-105 hover:shadow-2xl origin-center"
             >
-              <div className="relative w-full h-64 rounded overflow-hidden">
-                <Link href={`/product/${product.id}`}>
+              <div className="relative w-full aspect-[3/4] rounded overflow-hidden bg-white">
+                <Link
+                  href={`/product/${product.id}`}
+                  className="block w-full h-full"
+                >
                   <Image
                     src={product.image}
                     alt={product.title}
@@ -226,7 +249,6 @@ export default function ProductsPage() {
                   </span>
                 )}
               </div>
-
               <div className="space-y-1">
                 <h4 className="text-xl font-semibold line-clamp-1">
                   {product.title}
@@ -243,7 +265,6 @@ export default function ProductsPage() {
                 </div>
                 <p className="text-2xl font-semibold">${product.price}</p>
               </div>
-
               <button
                 onClick={() => dispatch({ type: "ADD_ITEM", payload: product })}
                 className="w-full bg-[#2F2F2F] text-white py-2 rounded-full hover:bg-gray-800 transition-all duration-200 cursor-pointer"
@@ -254,6 +275,22 @@ export default function ProductsPage() {
           ))}
         </div>
       </main>
+
+      {/* Floating Cart Icon */}
+      <div ref={cartIconRef} className="fixed top-4 right-4 z-50">
+        <Link href="/checkout">
+          <div className="relative">
+            <div className="bg-white shadow-lg rounded-full p-3">
+              <FaShoppingCart className="text-xl text-gray-700" />
+            </div>
+            {cartCount > 0 && (
+              <div className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-xs flex items-center justify-center rounded-full">
+                {cartCount}
+              </div>
+            )}
+          </div>
+        </Link>
+      </div>
     </div>
   );
 }

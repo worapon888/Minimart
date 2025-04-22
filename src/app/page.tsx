@@ -195,12 +195,13 @@ export default function Hero() {
             Minimal goods for maximal living
           </p>
 
-          <div ref={buttonRef}>
+          <div ref={buttonRef} className="relative inline-block">
             <Link href="/products">
-              <button className="inline-flex cursor-pointer items-center gap-2 px-6 py-3 bg-[#252525] text-white rounded-full hover:bg-gray-800 transition">
+              <button className="relative z-10 inline-flex cursor-pointer items-center gap-2 px-6 py-3 text-white rounded-full hover:opacity-90 transition overflow-hidden animate-gradient">
                 <span>→</span> Shop Now
               </button>
             </Link>
+            <div className="absolute inset-0 button-glow rounded-full pointer-events-none" />
           </div>
         </div>
       </div>
