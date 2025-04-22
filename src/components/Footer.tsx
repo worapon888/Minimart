@@ -59,7 +59,7 @@ export default function Footer() {
       <div className="max-w-7xl mx-auto px-6 py-12 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-8">
         {/* Logo & Social */}
         <div className="space-y-6 col-span-1 md:col-span-1">
-          <Image src="/logo.png" alt="logo" width={200} height={100} />
+          <Image src="/Logo.png" alt="logo" width={200} height={100} />
           <div className="flex gap-4 text-xl">
             {socialIcons.map((s, i) => {
               const iconColor =

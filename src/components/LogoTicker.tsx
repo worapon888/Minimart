@@ -1,29 +1,45 @@
 "use client";
+
 import Image from "next/image";
-import { Fragment, useEffect, useState } from "react";
+import { Fragment, useRef, useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { logos } from "../../data";
 
 export default function LogoTicker() {
-  const [mounted, setMounted] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [showTicker, setShowTicker] = useState(false);
+  const [width, setWidth] = useState(0);
 
   useEffect(() => {
-    setMounted(true);
+    // รอให้ DOM render เสร็จก่อน แล้วใช้ requestAnimationFrame → setTimeout → ค่อย render motion.div
+    requestAnimationFrame(() => {
+      setTimeout(() => {
+        if (containerRef.current) {
+          const totalWidth = containerRef.current.scrollWidth / 2;
+          setWidth(totalWidth);
+          setShowTicker(true);
+        }
+      }, 50); // delay 50ms ก็พอ
+    });
   }, []);
 
   return (
     <section className="py-24 overflow-x-clip">
       <div className="container">
-        <h3 className="text-center text-wrap/50 text-xl">
+        <h3 className="text-center text-xl">
           Already chosen by these market leaders
         </h3>
-        <div className="flex overflow-hidden mt-12 [mask-image:linear-gradient(to_right,transparent,black_10%,black_90%,transparent)]">
-          {mounted && (
+        <div
+          ref={containerRef}
+          className="mt-12 overflow-hidden [mask-image:linear-gradient(to_right,transparent,black_10%,black_90%,transparent)]"
+        >
+          {showTicker && width > 0 && (
             <motion.div
-              className="flex flex-none gap-24 pr-24"
-              animate={{ x: "-50%" }}
+              className="flex gap-24 pr-24"
+              initial={{ x: 0 }}
+              animate={{ x: -width }}
               transition={{
-                duration: 10,
+                duration: 18,
                 ease: "linear",
                 repeat: Infinity,
               }}
@@ -32,12 +48,12 @@ export default function LogoTicker() {
                 <Fragment key={i}>
                   {logos.map((logo) => (
                     <Image
+                      key={logo.name + i}
                       src={logo.image}
                       alt={logo.name}
-                      key={logo.name}
-                      className="object-contain"
                       width={120}
                       height={50}
+                      className="object-contain"
                     />
                   ))}
                 </Fragment>
