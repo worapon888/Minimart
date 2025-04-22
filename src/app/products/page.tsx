@@ -1,12 +1,19 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import {
+  useEffect,
+  useState,
+  useCallback,
+  useLayoutEffect,
+  useRef,
+} from "react";
 import { products as allProducts } from "@/data/products";
 import { Product } from "@/types/product";
 import Image from "next/image";
 import Link from "next/link";
 import { useCart } from "@/context/CartContext";
 import { useSearchParams } from "next/navigation";
+import gsap from "gsap";
 
 export default function ProductsPage() {
   const [products, setProducts] = useState<Product[]>([]);
@@ -17,6 +24,8 @@ export default function ProductsPage() {
 
   const searchParams = useSearchParams();
   const search = searchParams.get("search")?.toLowerCase() || "";
+
+  const cardsRef = useRef<(HTMLDivElement | null)[]>([]);
 
   useEffect(() => {
     setProducts(allProducts);
@@ -44,6 +53,31 @@ export default function ProductsPage() {
   useEffect(() => {
     handleFilter();
   }, [handleFilter]);
+
+  useLayoutEffect(() => {
+    const ctx = gsap.context(() => {
+      const targets = cardsRef.current.filter(Boolean);
+
+      gsap.killTweensOf(targets);
+      gsap.set(targets, { opacity: 1 });
+
+      gsap.from(targets, {
+        scale: 0,
+        opacity: 0,
+        duration: 0.3,
+        ease: "power3.in",
+        yoyo: true,
+        stagger: {
+          each: 0.02,
+
+          from: "start", // หรือลอง "center" ถ้าอยากให้เด้งจากตรงกลาง
+        },
+        clearProps: "transform",
+      });
+    });
+
+    return () => ctx.revert();
+  }, [filtered]);
 
   const uniqueCategories = [
     "All",
@@ -166,10 +200,16 @@ export default function ProductsPage() {
         </div>
 
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filtered.map((product) => (
+          {filtered.map((product, index) => (
             <div
               key={product.id}
-              className="bg-white shadow-md hover:scale-105 transition-all duration-300 ease-in-out rounded-lg p-4 space-y-3"
+              ref={(el) => {
+                cardsRef.current[index] = el;
+              }}
+              className="bg-white shadow-md rounded-lg p-4 space-y-3
+             transform transition-transform duration-500
+             ease-[cubic-bezier(0.25,0.8,0.25,1)]
+             hover:scale-105 hover:shadow-2xl origin-center"
             >
               <div className="relative w-full h-64 rounded overflow-hidden">
                 <Link href={`/product/${product.id}`}>

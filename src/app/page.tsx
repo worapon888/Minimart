@@ -111,18 +111,23 @@ export default function Hero() {
             />
             <div
               ref={sneakerTextRef}
-              className="absolute top-1 left-1 px-4 py-2 font-semibold text-xl leading-tight stroke-layer"
+              className="absolute top-2 left-1 px-3 sm:px-4 py-2 font-semibold text-base sm:text-lg md:text-xl leading-snug stroke-layer"
             >
-              <span className="block text-5xl font-normal stroke-layer">
-                Live{" "}
-                <span className="relative font-normal text-black text-[32px] z-0 leading-none stroke-layer">
-                  <span className="absolute top-0 left-0 text-white z-[-1] stroke-layer">
-                    less,
-                  </span>
+              {/* บรรทัด 1: Live */}
+              <p className="block text-[20px] sm:text-[24px] md:text-[26px] lg:text-[32px] xl:text-[40px] font-normal leading-tight tracking-tight">
+                Live
+              </p>
+
+              {/* บรรทัด 2: less, ซ้อนสองชั้น */}
+              <span className="relative block font-normal text-[14px] sm:text-[18px] md:text-[20px] lg:text-[24px] xl:text-[30px] leading-tight tracking-tight">
+                <span className="absolute top-0 left-0 text-white z-0">
                   less,
                 </span>
+                <span className="relative z-10 text-black">less,</span>
               </span>
-              <span className="block text-gray-600 font-normal">
+
+              {/* บรรทัด 3: feel more. */}
+              <span className="block text-gray-600 font-medium text-[12px] sm:text-[13px] md:text-[14px] lg:text-[16px] xl:text-[18px] mt-1">
                 feel more.
               </span>
             </div>
@@ -140,11 +145,16 @@ export default function Hero() {
             />
             <div
               ref={watchTextRef}
-              className="absolute top-3 left-3 text-white text-sm font-medium px-3 py-2 rounded-md"
+              className="absolute top-2 left-3 text-white text-sm font-medium px-3 py-2 rounded-md"
             >
-              <span className="stroke-layer2 text-xl font-normal">
-                <span className="text-3xl">Curated essentials</span> <br /> for
-                a simpler life.
+              <span className="stroke-layer2 font-normal tracking-tight">
+                <span className="block hidden lg:block text-[20px] xl:text-[22px] leading-[1.4]">
+                  Curated essentials
+                </span>
+
+                <span className="block text-[11px] sm:text-[12px] md:text-[13px] lg:text-[14px] xl:text-[16px] mt-1 leading-[1.5]">
+                  for a simpler life.
+                </span>
               </span>
             </div>
           </div>
@@ -161,10 +171,10 @@ export default function Hero() {
             />
             <div
               ref={guyTextRef}
-              className="absolute bottom-1 right-1 text-black text-sm font-medium text-right px-3 py-2 rounded-md backdrop-blur-sm"
+              className="absolute bottom-1 right-1 text-black text-sm font-medium text-right px-3 py-2  rounded-md"
             >
-              <span className="stroke-layer3 text-3xl font-normal">
-                Minimal goods <br /> for maximal <br /> living.
+              <span className="stroke-layer3 font-normal leading-snug tracking-tight text-[12px]  md:text-[12px] lg:text-[20px] xl:text-[32px]">
+                Minimal goods for maximal living.
               </span>
             </div>
           </div>
