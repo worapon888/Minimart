@@ -4,19 +4,28 @@ import Image from "next/image";
 import Link from "next/link";
 import { FaPlus } from "react-icons/fa";
 import { Category } from "@/types/product";
-import { useEffect, useState } from "react";
-import { motion } from "framer-motion";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import gsap from "gsap";
 
 export default function CategoriesProducts() {
   const [categories, setCategories] = useState<Category[]>([]);
-  const [mounted, setMounted] = useState(false);
+  const progressRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    setMounted(true);
-
     fetch("/api/categories")
       .then((res) => res.json())
       .then((data: Category[]) => setCategories(data));
+  }, []);
+
+  useLayoutEffect(() => {
+    if (progressRef.current) {
+      gsap.to(progressRef.current, {
+        x: "250%",
+        duration: 3.5,
+        ease: "linear",
+        repeat: -1,
+      });
+    }
   }, []);
 
   return (
@@ -25,17 +34,10 @@ export default function CategoriesProducts() {
       <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
         {/* Progress Bar */}
         <div className="w-full lg:flex-1 h-[6px] bg-gray-300 relative rounded-full overflow-hidden">
-          {mounted && (
-            <motion.div
-              className="absolute top-0 left-[-60%] h-full w-[60%] bg-gradient-to-r from-gray-700 via-gray-900 to-transparent opacity-70"
-              animate={{ x: "250%" }}
-              transition={{
-                duration: 3.5,
-                ease: "linear",
-                repeat: Infinity,
-              }}
-            />
-          )}
+          <div
+            ref={progressRef}
+            className="absolute top-0 left-[-60%] h-full w-[60%] bg-gradient-to-r from-gray-700 via-gray-900 to-transparent opacity-70"
+          />
         </div>
 
         {/* Title + Button */}

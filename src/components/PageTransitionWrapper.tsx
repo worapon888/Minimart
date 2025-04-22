@@ -1,8 +1,8 @@
 "use client";
 
-import { AnimatePresence, motion } from "framer-motion";
-import { usePathname } from "next/navigation";
 import { useLayoutEffect, useRef, useState } from "react";
+import { usePathname } from "next/navigation";
+import gsap from "gsap";
 
 const routeOrder: Record<string, number> = {
   "/": 0,
@@ -18,42 +18,55 @@ export default function PageTransitionWrapper({
 }) {
   const pathname = usePathname();
   const prevPath = useRef(pathname);
-  const [direction, setDirection] = useState(0);
+  const wrapperRef = useRef<HTMLDivElement>(null);
+  const [direction, setDirection] = useState(1);
+  const [key, setKey] = useState(pathname);
 
   useLayoutEffect(() => {
     const currentIndex = routeOrder[pathname] ?? 0;
     const prevIndex = routeOrder[prevPath.current] ?? 0;
     setDirection(currentIndex > prevIndex ? 1 : -1);
     prevPath.current = pathname;
+    setKey(pathname); // trigger re-render
   }, [pathname]);
 
+  useLayoutEffect(() => {
+    if (!wrapperRef.current) return;
+
+    const el = wrapperRef.current;
+
+    const tl = gsap.timeline();
+
+    tl.fromTo(
+      el,
+      {
+        xPercent: 50 * direction,
+        opacity: 0,
+        filter: "blur(8px)",
+      },
+      {
+        xPercent: 0,
+        opacity: 1,
+        filter: "blur(0px)",
+        duration: 0.5,
+        ease: "expo.out", // 👈 ลองเปลี่ยนเป็น curve ที่คุณชอบ
+      }
+    );
+
+    return () => {
+      gsap.to(el, {
+        xPercent: -50 * direction,
+        opacity: 0,
+        filter: "blur(6px)",
+        duration: 0.4,
+        ease: "power2.in", // 👈 ease ออกอาจใช้ soft กว่าได้
+      });
+    };
+  }, [key, direction]);
+
   return (
-    <AnimatePresence mode="wait" initial={false}>
-      <motion.div
-        key={pathname}
-        initial={{
-          x: `${direction * 50}%`,
-          opacity: 0,
-          filter: "blur(8px)",
-        }}
-        animate={{
-          x: "0%",
-          opacity: 1,
-          filter: "blur(0px)",
-        }}
-        exit={{
-          x: `${direction * -50}%`,
-          opacity: 0,
-          filter: "blur(6px)",
-        }}
-        transition={{
-          duration: 0.4,
-          ease: [0.22, 1, 0.36, 1],
-        }}
-        className="w-full"
-      >
-        {children}
-      </motion.div>
-    </AnimatePresence>
+    <div key={key} ref={wrapperRef} className="w-full">
+      {children}
+    </div>
   );
 }

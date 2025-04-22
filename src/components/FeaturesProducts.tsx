@@ -3,17 +3,14 @@
 import { FaPlus } from "react-icons/fa";
 import Image from "next/image";
 import { Product } from "@/types/product";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useLayoutEffect, useRef } from "react";
 import Link from "next/link";
-import { motion } from "framer-motion";
-
+import gsap from "gsap";
 export default function FeaturesProducts() {
   const [products, setProducts] = useState<Product[]>([]);
-  const [mounted, setMounted] = useState(false);
+  const progressRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    setMounted(true);
-
     fetch("/api/products")
       .then((res) => res.json())
       .then((data) => {
@@ -29,23 +26,27 @@ export default function FeaturesProducts() {
       });
   }, []);
 
+  useLayoutEffect(() => {
+    if (progressRef.current) {
+      gsap.to(progressRef.current, {
+        x: "290%",
+        duration: 3.5,
+        ease: "linear",
+        repeat: -1,
+      });
+    }
+  }, []);
+
   return (
     <section className="py-5 px-6">
       {/* Header */}
       <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
         {/* Progress Bar */}
         <div className="w-full lg:flex-1 h-[6px] bg-gray-300 relative rounded-full overflow-hidden">
-          {mounted && (
-            <motion.div
-              className="absolute top-0 left-[-60%] h-full w-[60%] bg-gradient-to-r from-gray-700 via-gray-900 to-transparent opacity-70"
-              animate={{ x: "290%" }}
-              transition={{
-                duration: 3.5,
-                ease: "linear",
-                repeat: Infinity,
-              }}
-            />
-          )}
+          <div
+            ref={progressRef}
+            className="absolute top-0 left-[-60%] h-full w-[60%] bg-gradient-to-r from-gray-700 via-gray-900 to-transparent opacity-70"
+          />
         </div>
 
         {/* Header Text + Button */}
