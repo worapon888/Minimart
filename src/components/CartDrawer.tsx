@@ -158,27 +158,26 @@ export default function CartDrawer({
             </div>
           ))
         )}
-      </div>
+        {/* Footer */}
+        {state.items.length > 0 && (
+          <div className="p-4 space-y-3">
+            <div className="flex justify-between text-sm font-medium">
+              <span>Total:</span>
+              <span>${totalPrice.toFixed(2)}</span>
+            </div>
 
-      {/* Footer */}
-      {state.items.length > 0 && (
-        <div className="p-4 border-t border-t-neutral-300/40 space-y-3">
-          <div className="flex justify-between text-sm font-medium">
-            <span>Total:</span>
-            <span>${totalPrice.toFixed(2)}</span>
+            <Link href="/checkout" passHref>
+              <button
+                onClick={onClose}
+                className="w-full cursor-pointer bg-[#2F2F2F] text-white py-2 rounded-full text-sm font-semibold hover:bg-gray-800 transition"
+                ref={badgeRef}
+              >
+                Go to Checkout
+              </button>
+            </Link>
           </div>
-
-          <Link href="/checkout" passHref>
-            <button
-              onClick={onClose}
-              className="w-full cursor-pointer bg-[#2F2F2F] text-white py-2 rounded-full text-sm font-semibold hover:bg-gray-800 transition"
-              ref={badgeRef}
-            >
-              Go to Checkout
-            </button>
-          </Link>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 }
