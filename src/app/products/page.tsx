@@ -15,6 +15,8 @@ import { useCart } from "@/context/CartContext";
 import { useSearchParams } from "next/navigation";
 import { FaShoppingCart } from "react-icons/fa";
 import gsap from "gsap";
+import toast from "react-hot-toast";
+import CartDrawer from "@/components/CartDrawer";
 
 export default function ProductsPage() {
   const [products, setProducts] = useState<Product[]>([]);
@@ -22,12 +24,14 @@ export default function ProductsPage() {
   const [category, setCategory] = useState("All");
   const [priceRange, setPriceRange] = useState<[number, number]>([10, 1000]);
   const { state, dispatch } = useCart();
+  const [isCartOpen, setCartOpen] = useState(false);
 
   const searchParams = useSearchParams();
   const search = searchParams.get("search")?.toLowerCase() || "";
 
   const cardsRef = useRef<(HTMLDivElement | null)[]>([]);
   const cartIconRef = useRef<HTMLDivElement>(null);
+  const imageRefs = useRef<(HTMLImageElement | null)[]>([]);
 
   useEffect(() => {
     setProducts(allProducts);
@@ -79,6 +83,36 @@ export default function ProductsPage() {
 
     return () => ctx.revert();
   }, [filtered]);
+
+  const animateToCart = (imgEl: HTMLImageElement | null) => {
+    if (!imgEl || !cartIconRef.current) return;
+
+    const cartRect = cartIconRef.current.getBoundingClientRect();
+    const imgRect = imgEl.getBoundingClientRect();
+
+    const clone = imgEl.cloneNode(true) as HTMLImageElement;
+    clone.style.position = "fixed";
+    clone.style.left = `${imgRect.left}px`;
+    clone.style.top = `${imgRect.top}px`;
+    clone.style.width = `${imgRect.width}px`;
+    clone.style.height = `${imgRect.height}px`;
+    clone.style.zIndex = "9999";
+    clone.style.pointerEvents = "none";
+
+    document.body.appendChild(clone);
+
+    gsap.to(clone, {
+      duration: 0.8,
+      left: cartRect.left + cartRect.width / 2 - imgRect.width / 4,
+      top: cartRect.top + cartRect.height / 2 - imgRect.height / 4,
+      scale: 0.3,
+      opacity: 0.5,
+      ease: "power2.inOut",
+      onComplete: () => {
+        document.body.removeChild(clone);
+      },
+    });
+  };
 
   useEffect(() => {
     const updatePosition = () => {
@@ -237,6 +271,7 @@ export default function ProductsPage() {
                   className="block w-full h-full"
                 >
                   <Image
+                    ref={(el) => void (imageRefs.current[index] = el)}
                     src={product.image}
                     alt={product.title}
                     fill
@@ -266,7 +301,11 @@ export default function ProductsPage() {
                 <p className="text-2xl font-semibold">${product.price}</p>
               </div>
               <button
-                onClick={() => dispatch({ type: "ADD_ITEM", payload: product })}
+                onClick={() => {
+                  dispatch({ type: "ADD_ITEM", payload: product });
+                  toast.success("Added to cart successfully!");
+                  animateToCart(imageRefs.current[index]);
+                }}
                 className="w-full bg-[#2F2F2F] text-white py-2 rounded-full hover:bg-gray-800 transition-all duration-200 cursor-pointer"
               >
                 Add to cart
@@ -276,21 +315,30 @@ export default function ProductsPage() {
         </div>
       </main>
 
-      {/* Floating Cart Icon */}
       <div ref={cartIconRef} className="fixed top-4 right-4 z-50">
-        <Link href="/checkout">
-          <div className="relative">
-            <div className="bg-white shadow-lg rounded-full p-3">
-              <FaShoppingCart className="text-xl text-gray-700" />
-            </div>
-            {cartCount > 0 && (
-              <div className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-xs flex items-center justify-center rounded-full">
-                {cartCount}
-              </div>
-            )}
+        <div className="relative">
+          <div
+            className="bg-white  shadow-lg rounded-full p-3 cursor-pointer"
+            onClick={() => setCartOpen(true)}
+          >
+            <FaShoppingCart className="text-xl text-gray-700" />
           </div>
-        </Link>
+          {cartCount > 0 && (
+            <div className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-xs flex items-center justify-center rounded-full">
+              {cartCount}
+            </div>
+          )}
+        </div>
       </div>
+
+      {/* Fly-out Cart Drawer */}
+      {isCartOpen && (
+        <div
+          className="fixed inset-0 bg-[#eeeeee]/50 backdrop-blur-sm z-40"
+          onClick={() => setCartOpen(false)}
+        />
+      )}
+      <CartDrawer isOpen={isCartOpen} onClose={() => setCartOpen(false)} />
     </div>
   );
 }

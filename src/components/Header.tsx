@@ -18,6 +18,7 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { IoMdExit } from "react-icons/io";
 import gsap from "gsap";
+import CartDrawer from "./CartDrawer";
 
 export default function Header() {
   const pathname = usePathname();
@@ -31,6 +32,8 @@ export default function Header() {
   const [isMounted, setIsMounted] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
+  const [isCartOpen, setCartOpen] = useState(false);
+
   // const [indicatorStyle, setIndicatorStyle] = useState({ left: 0, width: 0 });
 
   const indicatorRef = useRef<HTMLDivElement>(null);
@@ -133,7 +136,7 @@ export default function Header() {
   };
 
   return (
-    <header className="container mx-auto py-6 px-6 flex items-center justify-between w-full relative">
+    <header className="container mx-auto py-6 px-6 flex items-center justify-between w-full  relative">
       <div className="flex items-center gap-1 text-xl font-semibold">
         <Link href="/">
           <Image src="/Logo.png" alt="logo" width={200} height={100} />
@@ -213,24 +216,25 @@ export default function Header() {
             className="bg-transparent outline-none text-base font-normal"
           />
         </form>
-        <Link href="/checkout">
-          <div
-            className="relative bg-gray-200 rounded-full p-3 cursor-pointer 
-      transition-all duration-300 
-      ease-[cubic-bezier(0.68,-0.55,0.27,1.55)] 
-      hover:scale-110 hover:shadow-lg 
-      active:scale-95 active:shadow-inner 
-      hover:bg-amber-400"
-            title="Cart"
-          >
-            <FaShoppingBag className="text-xl text-gray-800" />
-            {isMounted && cartCount > 0 && (
-              <span className="absolute -top-1 -right-1 text-[13px] bg-red-500 text-white px-1.5 rounded-full shadow-md">
-                {cartCount}
-              </span>
-            )}
-          </div>
-        </Link>
+        <div
+          onClick={() => setCartOpen(true)} // ✅ เปิด Drawer
+          className="relative bg-gray-200 rounded-full p-3 cursor-pointer 
+    transition-all duration-300 
+    ease-[cubic-bezier(0.68,-0.55,0.27,1.55)] 
+    hover:scale-110 hover:shadow-lg 
+    active:scale-95 active:shadow-inner 
+    hover:bg-amber-400"
+          title="Cart"
+        >
+          <FaShoppingBag className="text-xl text-gray-800" />
+          {isMounted && cartCount > 0 && (
+            <span className="absolute -top-1 -right-1 text-[13px] bg-red-500 text-white px-1.5 rounded-full shadow-md">
+              {cartCount}
+            </span>
+          )}
+        </div>
+        {/* ✅ Fly-out Drawer */}
+        <CartDrawer isOpen={isCartOpen} onClose={() => setCartOpen(false)} />
 
         {session?.user ? (
           <DropdownMenu>

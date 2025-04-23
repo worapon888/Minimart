@@ -4,7 +4,8 @@ import { Gotham } from "@/app/fonts";
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
 import ClientProviders from "./ClientProviders";
-import PageTransitionWrapper from "@/components/PageTransitionWrapper"; // ✅ Import ที่นี่
+import PageTransitionWrapper from "@/components/PageTransitionWrapper";
+import { Toaster } from "react-hot-toast"; // ✅ เพิ่มตรงนี้
 
 export const metadata: Metadata = {
   title: "MinimalMart",
@@ -25,13 +26,15 @@ export default function RootLayout({
         <ClientProviders>
           <Header />
 
-          {/* ✅ Wrap ด้วย PageTransitionWrapper */}
           <PageTransitionWrapper>
-            <main className=" flex-grow">{children}</main>
+            <main className="flex-grow">{children}</main>
           </PageTransitionWrapper>
 
           <Footer />
         </ClientProviders>
+
+        {/* ✅ เพิ่ม Toaster ตรงนี้ */}
+        <Toaster position="top-right" reverseOrder={false} />
       </body>
     </html>
   );

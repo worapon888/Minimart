@@ -7,7 +7,8 @@ import { Product } from "@/types/product";
 import { useCart } from "@/context/CartContext";
 import gsap from "gsap";
 import { FaShoppingCart } from "react-icons/fa";
-import Link from "next/link";
+import toast from "react-hot-toast";
+import CartDrawer from "@/components/CartDrawer";
 
 const sizes = ["S", "M", "L", "XL", "2XL"];
 
@@ -17,6 +18,7 @@ export default function ProductDetailPage() {
   const [selectedSize, setSelectedSize] = useState("M");
   const [quantity, setQuantity] = useState(1);
   const { dispatch } = useCart();
+  const [isCartOpen, setCartOpen] = useState(false);
   const cartCount = useCart().state.items.reduce(
     (total, item) => total + item.quantity,
     0
@@ -78,6 +80,38 @@ export default function ProductDetailPage() {
         <div className="w-15 h-15 border-4 border-black border-t-transparent rounded-full animate-spin" />
       </div>
     );
+  const animateToCart = (sourceEl: HTMLDivElement | null) => {
+    if (!sourceEl || !cartIconRef.current) return;
+
+    const img = sourceEl.querySelector("img");
+    if (!img) return;
+
+    const imgRect = img.getBoundingClientRect();
+    const cartRect = cartIconRef.current.getBoundingClientRect();
+
+    const clone = img.cloneNode(true) as HTMLImageElement;
+    clone.style.position = "fixed";
+    clone.style.left = `${imgRect.left}px`;
+    clone.style.top = `${imgRect.top}px`;
+    clone.style.width = `${imgRect.width}px`;
+    clone.style.height = `${imgRect.height}px`;
+    clone.style.zIndex = "9999";
+    clone.style.pointerEvents = "none";
+
+    document.body.appendChild(clone);
+
+    gsap.to(clone, {
+      duration: 0.8,
+      left: cartRect.left + cartRect.width / 2 - imgRect.width / 4,
+      top: cartRect.top + cartRect.height / 2 - imgRect.height / 4,
+      scale: 0.3,
+      opacity: 0.3,
+      ease: "power2.inOut",
+      onComplete: () => {
+        document.body.removeChild(clone);
+      },
+    });
+  };
 
   return (
     <section className="container mx-auto p-6 grid grid-cols-1 md:grid-cols-2 gap-10">
@@ -142,31 +176,45 @@ export default function ProductDetailPage() {
             className="w-16 border px-2 py-1 rounded bg-white border-[#2F2F2F] text-center"
           />
           <button
-            onClick={() => dispatch({ type: "ADD_ITEM", payload: product })}
+            onClick={() => {
+              dispatch({ type: "ADD_ITEM", payload: product });
+              toast.success(" Added to cart successfully!");
+              animateToCart(imageRef.current);
+            }}
             className="bg-[#2F2F2F] text-white px-6 py-2 rounded-3xl hover:opacity-90 text-lg cursor-pointer"
           >
             Add to cart
           </button>
+
           <button className="border px-6 py-2 hover:bg-gray-100 bg-white text-lg rounded-3xl cursor-pointer">
             View cart
           </button>
         </div>
       </div>
       {/* Floating Cart Icon */}
-      <div ref={cartIconRef} className="absolute top-4 right-4 z-50">
-        <Link href="/checkout">
-          <div className="relative">
-            <div className="bg-white shadow-lg rounded-full p-3">
-              <FaShoppingCart className="text-xl text-gray-700" />
-            </div>
-            {cartCount > 0 && (
-              <div className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-xs flex items-center justify-center rounded-full">
-                {cartCount}
-              </div>
-            )}
+      <div ref={cartIconRef} className="fixed top-4 right-4 z-50">
+        <div className="relative">
+          <div
+            className="bg-white  shadow-lg rounded-full p-3 cursor-pointer"
+            onClick={() => setCartOpen(true)}
+          >
+            <FaShoppingCart className="text-xl text-gray-700" />
           </div>
-        </Link>
+          {cartCount > 0 && (
+            <div className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-xs flex items-center justify-center rounded-full">
+              {cartCount}
+            </div>
+          )}
+        </div>
       </div>
+      {/* Fly-out Cart Drawer */}
+      {isCartOpen && (
+        <div
+          className="fixed inset-0 bg-[#eeeeee]/50 backdrop-blur-sm z-40"
+          onClick={() => setCartOpen(false)}
+        />
+      )}
+      <CartDrawer isOpen={isCartOpen} onClose={() => setCartOpen(false)} />
     </section>
   );
 }

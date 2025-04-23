@@ -9,15 +9,19 @@ import { useCart } from "@/context/CartContext";
 import { ImSpinner2 } from "react-icons/im";
 import { FaShoppingCart } from "react-icons/fa";
 import gsap from "gsap";
+import toast from "react-hot-toast";
+import CartDrawer from "@/components/CartDrawer";
 
 export default function CategoryPage() {
   const { category } = useParams();
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const { state, dispatch } = useCart();
+  const [isCartOpen, setCartOpen] = useState(false);
 
   const cardsRef = useRef<(HTMLDivElement | null)[]>([]);
   const cartIconRef = useRef<HTMLDivElement>(null);
+  const imageRefs = useRef<(HTMLDivElement | null)[]>([]);
 
   useEffect(() => {
     if (!category) return;
@@ -74,14 +78,51 @@ export default function CategoryPage() {
     return () => window.removeEventListener("scroll", updatePosition);
   }, []);
 
-  const handleAddToCart = (product: Product) => {
+  const handleAddToCart = (product: Product, index: number) => {
     dispatch({ type: "ADD_ITEM", payload: product });
+    toast.success(" Added to cart successfully!");
+    animateToCart(index);
   };
 
   const cartCount = state.items.reduce(
     (total, item) => total + item.quantity,
     0
   );
+
+  const animateToCart = (index: number) => {
+    const source = imageRefs.current[index];
+    const icon = cartIconRef.current;
+    if (!source || !icon) return;
+
+    const img = source.querySelector("img");
+    if (!img) return;
+
+    const imgRect = img.getBoundingClientRect();
+    const cartRect = icon.getBoundingClientRect();
+
+    const clone = img.cloneNode(true) as HTMLImageElement;
+    clone.style.position = "fixed";
+    clone.style.left = `${imgRect.left}px`;
+    clone.style.top = `${imgRect.top}px`;
+    clone.style.width = `${imgRect.width}px`;
+    clone.style.height = `${imgRect.height}px`;
+    clone.style.zIndex = "9999";
+    clone.style.pointerEvents = "none";
+
+    document.body.appendChild(clone);
+
+    gsap.to(clone, {
+      duration: 0.8,
+      left: cartRect.left + cartRect.width / 2 - imgRect.width / 4,
+      top: cartRect.top + cartRect.height / 2 - imgRect.height / 4,
+      scale: 0.3,
+      opacity: 0.3,
+      ease: "power2.inOut",
+      onComplete: () => {
+        document.body.removeChild(clone);
+      },
+    });
+  };
 
   return (
     <div className="max-w-7xl mx-auto px-6 py-14">
@@ -100,7 +141,10 @@ export default function CategoryPage() {
           {products.map((product, i) => (
             <div
               key={product.id}
-              ref={(el) => void (cardsRef.current[i] = el)}
+              ref={(el) => {
+                cardsRef.current[i] = el;
+                imageRefs.current[i] = el;
+              }}
               className="bg-white shadow-md hover:scale-105 transition-all duration-300 ease-in-out rounded-lg p-4 space-y-3"
             >
               <div className="relative w-full h-64 rounded overflow-hidden">
@@ -137,7 +181,7 @@ export default function CategoryPage() {
               </div>
 
               <button
-                onClick={() => handleAddToCart(product)}
+                onClick={() => handleAddToCart(product, i)}
                 className="w-full bg-[#2F2F2F] text-white py-2 rounded-full hover:bg-gray-800 transition-all duration-200 cursor-pointer"
               >
                 Add to cart
@@ -149,19 +193,28 @@ export default function CategoryPage() {
 
       {/* Floating Cart Icon */}
       <div ref={cartIconRef} className="fixed top-4 right-4 z-50">
-        <Link href="/checkout">
-          <div className="relative">
-            <div className="bg-white  shadow-lg rounded-full p-3">
-              <FaShoppingCart className="text-xl text-gray-700" />
-            </div>
-            {cartCount > 0 && (
-              <div className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-xs flex items-center justify-center rounded-full">
-                {cartCount}
-              </div>
-            )}
+        <div className="relative">
+          <div
+            className="bg-white  shadow-lg rounded-full p-3 cursor-pointer"
+            onClick={() => setCartOpen(true)}
+          >
+            <FaShoppingCart className="text-xl text-gray-700" />
           </div>
-        </Link>
+          {cartCount > 0 && (
+            <div className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-xs flex items-center justify-center rounded-full">
+              {cartCount}
+            </div>
+          )}
+        </div>
       </div>
+      {/* Fly-out Cart Drawer */}
+      {isCartOpen && (
+        <div
+          className="fixed inset-0 bg-[#eeeeee]/50 backdrop-blur-sm z-40"
+          onClick={() => setCartOpen(false)}
+        />
+      )}
+      <CartDrawer isOpen={isCartOpen} onClose={() => setCartOpen(false)} />
     </div>
   );
 }
