@@ -1,36 +1,42 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+![thumnail_mininal](https://github.com/user-attachments/assets/002e8842-1f52-4773-97eb-e843fe73d9fe)
 
-## Getting Started
 
-First, run the development server:
+🧵 [Project Showcase] MinimalMart – Motion-first E-Commerce UI with GSAP + Next.js 15
+🧵 [Project Showcase] MinimalMart – Motion-first E-Commerce UI with GSAP + Next.js 15
+MinimalMart is a solo-built e-commerce frontend concept, designed to explore what a motion-first, user-centric shopping experience could look like in 2025.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+⚙️ Tech Stack
+Next.js 15 (App Router) – for modern routing and file-based structure
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Tailwind CSS 4.0 – with custom breakpoints and container logic
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+GSAP – powering smooth motion, soft-shake effects, and animated cart interactions
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+TypeScript – with modular state and strict types
 
-## Learn More
+🧠 Key Features
+🛒 Animated Add-to-Cart with floating cart preview
 
-To learn more about Next.js, take a look at the following resources:
+🎯 Real-time filter/search with URL params + local state
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+📱 Responsive layout with layout-specific overrides
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+🌐 SEO-ready: metadata, OG image, alt tags, sitemap.xml
 
-## Deploy on Vercel
+🎯 Design Philosophy
+MinimalMart is not just about “a clean UI.”
+It's about building an interface that feels alive — through soft, thoughtful motion that doesn’t get in the user’s way, but helps them engage with the product and flow naturally through each interaction.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+📦 Live Demo
+🔗 https://minimart-three.vercel.app
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+🙋‍♂️ Looking For:
+Feedback on motion flow & UX design
+
+Devs who are into design systems + animation + solo craft
+
+Conversations around how motion can shape perceived quality
+
+If you're curious to see more or want to dig into the structure, DM me — I'm always happy to connect with other motion-nerds and frontend lovers 😄
+
+nextjs #tailwindcss #gsap #webdev #frontend #showcase
