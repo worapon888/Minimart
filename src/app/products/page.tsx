@@ -35,7 +35,6 @@ export default function ProductsPage() {
   const imageWrapRefs = useRef<(HTMLDivElement | null)[]>([]);
 
   useEffect(() => {
-    // ถ้าอยากใช้ fetch ก็เปลี่ยนได้ แต่ตอนนี้คุณใช้ local data อยู่
     setProducts(allProducts);
     setFiltered(allProducts);
   }, []);
@@ -63,6 +62,10 @@ export default function ProductsPage() {
 
   // subtle grid entrance
   useLayoutEffect(() => {
+    // กัน ref เพี้ยนเมื่อ filtered เปลี่ยน (สำคัญมาก)
+    cardsRef.current = [];
+    imageWrapRefs.current = [];
+
     const ctx = gsap.context(() => {
       const targets = cardsRef.current.filter(Boolean) as HTMLDivElement[];
       gsap.killTweensOf(targets);
@@ -88,6 +91,7 @@ export default function ProductsPage() {
   const animateToCart = (wrapEl: HTMLDivElement | null) => {
     if (!wrapEl || !cartIconRef.current) return;
 
+    // Next/Image จะ render เป็น <img> อยู่ด้านใน
     const imgEl = wrapEl.querySelector("img") as HTMLImageElement | null;
     if (!imgEl) return;
 
@@ -104,6 +108,7 @@ export default function ProductsPage() {
     clone.style.pointerEvents = "none";
     clone.style.borderRadius = "16px";
     clone.style.background = "white";
+    clone.style.objectFit = "contain";
 
     document.body.appendChild(clone);
 
@@ -297,16 +302,42 @@ export default function ProductsPage() {
           </aside>
 
           {/* Products */}
-          <main>
+          <main className="relative">
+            {/* ✅ Cart follows scroll container (sticky) */}
+            <div className="sticky top-25 z-[90] flex justify-end">
+              <div ref={cartIconRef}>
+                <button
+                  onClick={() => setCartOpen(true)}
+                  className="
+                    relative grid place-items-center
+                    size-12 rounded-full
+                    border border-black/10 bg-white/80 backdrop-blur-xl
+                    shadow-[0_10px_30px_-20px_rgba(0,0,0,0.45)]
+                    hover:bg-white transition
+                    active:scale-95
+                  "
+                  aria-label="Open cart"
+                  type="button"
+                >
+                  <FaShoppingCart className="text-[18px] text-black/70" />
+                  {cartCount > 0 ? (
+                    <span className="absolute -top-1 -right-1 grid place-items-center size-5 rounded-full bg-black text-white text-[10px]">
+                      {cartCount}
+                    </span>
+                  ) : null}
+                </button>
+              </div>
+            </div>
+
             {filtered.length === 0 ? (
-              <div className="rounded-3xl border border-black/10 bg-white/60 p-10 text-center">
+              <div className="mt-6 rounded-3xl border border-black/10 bg-white/60 p-10 text-center">
                 <p className="text-sm text-black/60">No products found.</p>
                 <p className="mt-2 text-xs text-black/40">
                   Try adjusting your filters or search keywords.
                 </p>
               </div>
             ) : (
-              <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              <div className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
                 {filtered.map((product, index) => {
                   const imgSrc =
                     (product.thumbnail && product.thumbnail.trim()) ||
@@ -412,29 +443,6 @@ export default function ProductsPage() {
               </div>
             )}
           </main>
-        </div>
-
-        {/* Floating cart button */}
-        <div ref={cartIconRef} className="fixed top-5 right-5 z-[80]">
-          <button
-            onClick={() => setCartOpen(true)}
-            className="
-              relative grid place-items-center
-              size-12 rounded-full
-              border border-black/10 bg-white/80 backdrop-blur-xl
-              shadow-[0_10px_30px_-20px_rgba(0,0,0,0.45)]
-              hover:bg-white transition
-            "
-            aria-label="Open cart"
-            type="button"
-          >
-            <FaShoppingCart className="text-[18px] text-black/70" />
-            {cartCount > 0 ? (
-              <span className="absolute -top-1 -right-1 grid place-items-center size-5 rounded-full bg-black text-white text-[10px]">
-                {cartCount}
-              </span>
-            ) : null}
-          </button>
         </div>
 
         {/* Backdrop */}

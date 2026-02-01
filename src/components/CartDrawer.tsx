@@ -84,7 +84,7 @@ export default function CartDrawer({
           duration: 0.18,
           onComplete: () => {
             gsap.set(overlay, { pointerEvents: "none" });
-            return;
+            return; // ✅ ทำให้ TS มองว่า onComplete คืน void แน่นอน
           },
         },
         0.05,
@@ -105,7 +105,7 @@ export default function CartDrawer({
         onClick={onClose}
         className="
           fixed inset-0 z-[90]
-          bg-gray-300/15 backdrop-blur-[2px]
+          bg-white backdrop-blur-[2px]
           transition-opacity duration-300
         "
         aria-hidden={!isOpen}
@@ -116,7 +116,7 @@ export default function CartDrawer({
         ref={drawerRef}
         className="
           fixed top-0 right-0 z-[100] h-full w-[92vw] sm:w-[420px]
-          bg-white/85 border-l border-black/10
+          bg-white border-l border-black/10
           flex flex-col
         "
         aria-hidden={!isOpen}

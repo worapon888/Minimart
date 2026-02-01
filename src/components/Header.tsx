@@ -24,30 +24,26 @@ export default function Header() {
   const pathname = usePathname();
   const router = useRouter();
   const { state } = useCart();
-  const cartCount = state.items.reduce(
-    (total, item) => total + item.quantity,
-    0,
-  );
+  const cartCount = state.items.reduce((t, i) => t + i.quantity, 0);
   const { data: session } = useSession();
+
   const [isMounted, setIsMounted] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [isCartOpen, setCartOpen] = useState(false);
 
-  // const [indicatorStyle, setIndicatorStyle] = useState({ left: 0, width: 0 });
-
   const indicatorRef = useRef<HTMLDivElement>(null);
   const navContainerRef = useRef<HTMLDivElement>(null);
+
   const searchRef = useRef<HTMLFormElement>(null);
   const cartRef = useRef<HTMLDivElement>(null);
-  const mobileMenuRef = useRef<HTMLDivElement | null>(null);
 
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
+  const mobilePanelRef = useRef<HTMLDivElement | null>(null);
 
+  useEffect(() => setIsMounted(true), []);
+
+  // Bounce cart icon เมื่อ cartCount เปลี่ยน
   useEffect(() => {
-    // Bounce cart icon เมื่อ cartCount เปลี่ยน
     if (cartRef.current && isMounted && cartCount > 0) {
       gsap.fromTo(
         cartRef.current,
@@ -61,29 +57,10 @@ export default function Header() {
         },
       );
     }
-  }, [cartCount]);
+  }, [cartCount, isMounted]);
 
+  // Desktop first-load anim
   useLayoutEffect(() => {
-    if (menuOpen && mobileMenuRef.current) {
-      const ctx = gsap.context(() => {
-        gsap.fromTo(
-          mobileMenuRef.current,
-          { opacity: 0, y: -20 },
-          {
-            opacity: 1,
-            y: 0,
-            duration: 0.4,
-            ease: "power2.out",
-          },
-        );
-      });
-
-      return () => ctx.revert();
-    }
-  }, [menuOpen]);
-
-  useLayoutEffect(() => {
-    // Animation ตอนโหลดเข้า
     if (searchRef.current) {
       gsap.fromTo(
         searchRef.current,
@@ -100,6 +77,22 @@ export default function Header() {
     }
   }, []);
 
+  // Mobile panel open anim
+  useLayoutEffect(() => {
+    if (!menuOpen || !mobilePanelRef.current) return;
+
+    const ctx = gsap.context(() => {
+      gsap.fromTo(
+        mobilePanelRef.current,
+        { opacity: 0, y: -10, scale: 0.98 },
+        { opacity: 1, y: 0, scale: 1, duration: 0.35, ease: "power2.out" },
+      );
+    });
+
+    return () => ctx.revert();
+  }, [menuOpen]);
+
+  // Desktop indicator anim (เดิม)
   useEffect(() => {
     const activeLink = document.querySelector(
       `a[data-active="true"]`,
@@ -119,27 +112,21 @@ export default function Header() {
     const targetX = linkBox.left - containerBox.left;
     const targetW = linkBox.width;
 
-    // current position (ไว้ใช้ทำ overshoot แบบฉลาด ๆ)
     const currentX = gsap.getProperty(indicator, "x") as number;
     const goingRight = targetX > currentX;
 
-    const overshoot = Math.min(18, Math.max(10, targetW * 0.12)); // ปรับได้
-    const stretchW = Math.min(24, Math.max(12, targetW * 0.18)); // ปรับได้
+    const overshoot = Math.min(18, Math.max(10, targetW * 0.12));
+    const stretchW = Math.min(24, Math.max(12, targetW * 0.18));
 
-    // kill timeline เก่าก่อน กันทับกัน
     gsap.killTweensOf(indicator);
 
     const tl = gsap.timeline();
-
-    // 1) “ลากหัว” ไปก่อน + width ยืดเล็กน้อย (เหมือนโดนดึง)
     tl.to(indicator, {
       x: targetX + (goingRight ? overshoot : -overshoot),
       width: targetW + stretchW,
       duration: 0.22,
       ease: "sine.out",
     });
-
-    // 2) “ปล่อยตัว” ให้เด้งกลับเข้าที่ (jelly feel)
     tl.to(
       indicator,
       {
@@ -152,6 +139,11 @@ export default function Header() {
     );
   }, [pathname]);
 
+  // ปิด mobile menu เมื่อเปลี่ยนหน้า
+  useEffect(() => {
+    setMenuOpen(false);
+  }, [pathname]);
+
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     const query = searchTerm.trim();
@@ -162,224 +154,345 @@ export default function Header() {
   };
 
   return (
-    <header className="container mx-auto py-6 px-6 flex items-center justify-between w-full  relative">
-      <div className="flex items-center gap-1 text-xl font-semibold">
-        <Link href="/">
-          <Image src="/Logo.png" alt="logo" width={200} height={100} />
-        </Link>
-      </div>
+    <header className="sticky top-0 z-50 bg-transparent">
+      <div className="container mx-auto px-4 sm:px-6">
+        {/* Top Row */}
+        <div className="py-4 sm:py-6 flex items-center justify-between gap-3">
+          {/* Left: Logo */}
+          <div className="flex items-center">
+            <Link href="/" className="block">
+              <Image
+                src="/Logo.png"
+                alt="logo"
+                width={160}
+                height={80}
+                className="h-auto w-[140px] sm:w-[160px] md:w-[180px]"
+                priority
+              />
+            </Link>
+          </div>
 
-      {/* 🔧 Hamburger Toggle Button - แสดงเฉพาะบน mobile */}
-      <div className="lg:hidden">
-        <button onClick={() => setMenuOpen(!menuOpen)} className="text-3xl">
-          {menuOpen ? <HiX /> : <HiMenuAlt3 />}
-        </button>
-      </div>
-
-      {/* 🔒 Desktop Navbar */}
-      <nav className="hidden lg:flex items-center text-base">
-        <div
-          ref={navContainerRef}
-          className="
-    relative 
-    bg-white/80 
-    backdrop-blur-sm
-    font-medium 
-    rounded-full 
-    border 
-    border-gray-200 
-    flex 
-    items-center 
-    gap-2 
-    -px-2 
-    py-1
-    shadow-sm
-  "
-        >
-          <div
-            ref={indicatorRef}
-            className="
-    absolute top-0 left-0 
-    h-full 
-    bg-black/70 
-    rounded-full 
-    z-0 
-    shadow-sm
-  "
-            style={{ width: 0 }}
-          />
-
-          {NavbarItem.map((nav) => {
-            const isActive = pathname === nav.href;
-            return (
-              <Link
-                key={nav.href}
-                href={nav.href}
-                data-active={isActive ? "true" : "false"}
-                className="relative px-5 py-2 flex items-center justify-center rounded-full z-10
-             text-[12px] sm:text-[13px] font-normal tracking-[0.18em]
-             text-neutral-700 transition-colors"
-              >
-                <span className={isActive ? "text-white" : "text-neutral-600"}>
-                  {nav.item}
-                </span>
-              </Link>
-            );
-          })}
-        </div>
-      </nav>
-
-      {/* 📱 Mobile Menu (Minimal) */}
-      {menuOpen && (
-        <div
-          ref={mobileMenuRef}
-          className="
-      absolute left-0 w-full lg:hidden mt-4 z-50
-      rounded-2xl border border-black/5
-      bg-white/80 backdrop-blur-xl
-      shadow-[0_10px_30px_-20px_rgba(0,0,0,0.25)]
-    "
-        >
-          <nav className="flex flex-col items-center gap-3 py-5">
-            {NavbarItem.map((nav) => (
-              <Link
-                key={nav.href}
-                href={nav.href}
-                onClick={() => setMenuOpen(false)}
+          {/* Center: Desktop Nav */}
+          <nav className="hidden lg:flex items-center justify-center flex-1">
+            <div
+              ref={navContainerRef}
+              className="
+                relative
+                bg-white/80 backdrop-blur-sm
+                rounded-full border border-gray-200
+                flex items-center gap-2
+                 py-1
+                shadow-sm
+              "
+            >
+              <div
+                ref={indicatorRef}
                 className="
-            text-[13px] uppercase tracking-[0.18em]
-            text-black/70 hover:text-black
-            transition-colors
-          "
-              >
-                {nav.item}
-              </Link>
-            ))}
+                  absolute top-0 left-0 h-full
+                  bg-black/70 rounded-full z-0 shadow-sm
+                "
+                style={{ width: 0 }}
+              />
+
+              {NavbarItem.map((nav) => {
+                const isActive = pathname === nav.href;
+                return (
+                  <Link
+                    key={nav.href}
+                    href={nav.href}
+                    data-active={isActive ? "true" : "false"}
+                    className="
+                      relative z-10
+                      px-5 py-2
+                      rounded-full
+                      text-[12px] sm:text-[13px]
+                      font-normal tracking-[0.18em]
+                      transition-colors
+                    "
+                  >
+                    <span
+                      className={isActive ? "text-white" : "text-neutral-600"}
+                    >
+                      {nav.item}
+                    </span>
+                  </Link>
+                );
+              })}
+            </div>
           </nav>
-        </div>
-      )}
 
-      {/* Right Icons - Desktop */}
-      <div className="hidden lg:flex items-center gap-5">
-        <form
-          onSubmit={handleSearch}
-          ref={searchRef}
-          className="
-    flex items-center rounded-full
-    border border-black/10 bg-white/70 backdrop-blur
-    px-4 py-2
-    transition
-    focus-within:border-black/25
-  "
-        >
-          <FaSearch className="mr-2 text-[14px] text-black/50" />
-          <input
-            type="text"
-            placeholder="Search"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="
-      w-40 bg-transparent outline-none
-      text-[13px] tracking-wide text-black/80
-      placeholder:text-black/35
-    "
-          />
-        </form>
-
-        <div
-          onClick={() => setCartOpen(true)}
-          className="
-    relative cursor-pointer rounded-full
-    border border-black/10 bg-white/70 backdrop-blur
-    p-3
-    transition
-    hover:bg-white
-    hover:border-black/20
-    active:scale-[0.98]
-  "
-          title="Cart"
-        >
-          <FaShoppingBag className="text-[18px] text-black/70" />
-
-          {isMounted && cartCount > 0 && (
-            <span
+          {/* Right: Actions */}
+          <div className="flex items-center gap-2 sm:gap-3">
+            {/* Desktop Search */}
+            <form
+              onSubmit={handleSearch}
+              ref={searchRef}
               className="
-        absolute -top-1 -right-1
-        min-w-[18px] h-[18px] px-1
-        rounded-full
-        bg-black text-white
-        text-[11px] leading-[18px] text-center
-      "
+                hidden lg:flex items-center rounded-full
+                border border-black/10 bg-white/70 backdrop-blur
+                px-4 py-2
+                transition focus-within:border-black/25
+              "
             >
-              {cartCount}
-            </span>
-          )}
-        </div>
-
-        {/* ✅ Fly-out Drawer */}
-        <CartDrawer isOpen={isCartOpen} onClose={() => setCartOpen(false)} />
-
-        {session?.user ? (
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Avatar className="cursor-pointer hover:ring-2 hover:ring-black/10 transition">
-                <AvatarImage src={session.user.image || ""} alt="User Avatar" />
-                <AvatarFallback>
-                  {session.user.name?.charAt(0).toUpperCase() || "U"}
-                </AvatarFallback>
-              </Avatar>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent
-              className="
-    w-56 rounded-2xl border border-black/5
-    bg-white/90 backdrop-blur-xl
-    shadow-[0_12px_30px_-22px_rgba(0,0,0,0.35)]
-    p-2
-  "
-              align="end"
-            >
-              <div className="px-3 py-2">
-                <div className="text-[12px] uppercase tracking-[0.22em] text-black/45">
-                  Signed in as
-                </div>
-                <div className="mt-1 text-[13px] font-normal tracking-wide text-black/80">
-                  {session.user.name}
-                </div>
-              </div>
-
-              <DropdownMenuItem
-                onClick={() => signOut({ callbackUrl: "/" })}
+              <FaSearch className="mr-2 text-[14px] text-black/50" />
+              <input
+                type="text"
+                placeholder="Search"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
                 className="
-      mt-1 cursor-pointer rounded-xl
-      px-3 py-2
-      text-[13px] text-black/70
-      hover:bg-black/5 hover:text-black
-      transition
-      flex items-center gap-2
-    "
-              >
-                <IoMdExit className="text-[18px] text-black/60" />
-                Sign out
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        ) : (
+                  w-44 bg-transparent outline-none
+                  text-[13px] tracking-wide text-black/80
+                  placeholder:text-black/35
+                "
+              />
+            </form>
+
+            {/* Cart (show both mobile+desktop) */}
+            <div
+              ref={cartRef}
+              onClick={() => setCartOpen(true)}
+              className="
+                relative cursor-pointer rounded-full
+                border border-black/10 bg-white/70 backdrop-blur
+                p-3
+                transition
+                hover:bg-white hover:border-black/20
+                active:scale-[0.98]
+              "
+              title="Cart"
+            >
+              <FaShoppingBag className="text-[18px] text-black/70" />
+              {isMounted && cartCount > 0 && (
+                <span
+                  className="
+                    absolute -top-1 -right-1
+                    min-w-[18px] h-[18px] px-1
+                    rounded-full bg-black text-white
+                    text-[11px] leading-[18px] text-center
+                  "
+                >
+                  {cartCount}
+                </span>
+              )}
+            </div>
+
+            {/* Desktop Avatar / Login */}
+            <div className="hidden lg:block">
+              {session?.user ? (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Avatar className="cursor-pointer hover:ring-2 hover:ring-black/10 transition">
+                      <AvatarImage
+                        src={session.user.image || ""}
+                        alt="User Avatar"
+                      />
+                      <AvatarFallback>
+                        {session.user.name?.charAt(0).toUpperCase() || "U"}
+                      </AvatarFallback>
+                    </Avatar>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent
+                    className="
+                      w-56 rounded-2xl border border-black/5
+                      bg-white/90 backdrop-blur-xl
+                      shadow-[0_12px_30px_-22px_rgba(0,0,0,0.35)]
+                      p-2
+                    "
+                    align="end"
+                  >
+                    <div className="px-3 py-2">
+                      <div className="text-[12px] uppercase tracking-[0.22em] text-black/45">
+                        Signed in as
+                      </div>
+                      <div className="mt-1 text-[13px] font-normal tracking-wide text-black/80">
+                        {session.user.name}
+                      </div>
+                    </div>
+
+                    <DropdownMenuItem
+                      onClick={() => signOut({ callbackUrl: "/" })}
+                      className="
+                        mt-1 cursor-pointer rounded-xl
+                        px-3 py-2 text-[13px] text-black/70
+                        hover:bg-black/5 hover:text-black
+                        transition flex items-center gap-2
+                      "
+                    >
+                      <IoMdExit className="text-[18px] text-black/60" />
+                      Sign out
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              ) : (
+                <div
+                  onClick={() => router.push("/login")}
+                  className="
+                    cursor-pointer rounded-full
+                    border border-black/10 bg-white/70 backdrop-blur
+                    p-3
+                    transition
+                    hover:bg-white hover:border-black/20
+                    active:scale-[0.98]
+                  "
+                  title="Sign in"
+                >
+                  <FaUser className="text-[18px] text-black/70" />
+                </div>
+              )}
+            </div>
+
+            {/* Mobile Hamburger */}
+            <button
+              onClick={() => setMenuOpen((v) => !v)}
+              className="
+                lg:hidden
+                rounded-full
+                border border-black/10 bg-white/70 backdrop-blur
+                p-3
+                transition
+                hover:bg-white hover:border-black/20
+                active:scale-[0.98]
+              "
+              aria-label="Open menu"
+            >
+              <span className="text-2xl text-black/70">
+                {menuOpen ? <HiX /> : <HiMenuAlt3 />}
+              </span>
+            </button>
+          </div>
+        </div>
+
+        {/* Mobile Panel */}
+        {menuOpen && (
           <div
-            onClick={() => router.push("/login")}
+            ref={mobilePanelRef}
             className="
-    cursor-pointer rounded-full
-    border border-black/10 bg-white/70 backdrop-blur
-    p-3
-    transition
-    hover:bg-white hover:border-black/20
-    active:scale-[0.98]
-  "
-            title="Sign in"
+              lg:hidden
+              pb-4
+            "
           >
-            <FaUser className="text-[18px] text-black/70" />
+            <div
+              className="
+                rounded-2xl border border-black/5
+                bg-white/80 backdrop-blur-xl
+                shadow-[0_12px_30px_-22px_rgba(0,0,0,0.35)]
+                p-4
+              "
+            >
+              {/* Search on mobile */}
+              <form
+                onSubmit={handleSearch}
+                className="
+                  flex items-center rounded-full
+                  border border-black/10 bg-white/70 backdrop-blur
+                  px-4 py-2
+                  focus-within:border-black/25
+                "
+              >
+                <FaSearch className="mr-2 text-[14px] text-black/50" />
+                <input
+                  type="text"
+                  placeholder="Search"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="
+                    w-full bg-transparent outline-none
+                    text-[13px] tracking-wide text-black/80
+                    placeholder:text-black/35
+                  "
+                />
+              </form>
+
+              {/* Nav list */}
+              <nav className="mt-4 flex flex-col gap-2">
+                {NavbarItem.map((nav) => {
+                  const isActive = pathname === nav.href;
+                  return (
+                    <Link
+                      key={nav.href}
+                      href={nav.href}
+                      onClick={() => setMenuOpen(false)}
+                      className="
+                        flex items-center justify-between
+                        rounded-xl px-3 py-3
+                        text-[13px] uppercase tracking-[0.18em]
+                        transition
+                        hover:bg-black/5
+                      "
+                    >
+                      <span
+                        className={isActive ? "text-black" : "text-black/70"}
+                      >
+                        {nav.item}
+                      </span>
+                      {isActive && (
+                        <span className="text-[11px] tracking-[0.22em] text-black/45">
+                          ACTIVE
+                        </span>
+                      )}
+                    </Link>
+                  );
+                })}
+              </nav>
+
+              {/* Auth row on mobile */}
+              <div className="mt-4 pt-4 border-t border-black/10 flex items-center justify-between">
+                {session?.user ? (
+                  <div className="flex items-center gap-3">
+                    <Avatar>
+                      <AvatarImage
+                        src={session.user.image || ""}
+                        alt="User Avatar"
+                      />
+                      <AvatarFallback>
+                        {session.user.name?.charAt(0).toUpperCase() || "U"}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="text-[13px] text-black/75">
+                      {session.user.name}
+                    </div>
+                  </div>
+                ) : (
+                  <button
+                    onClick={() => {
+                      setMenuOpen(false);
+                      router.push("/login");
+                    }}
+                    className="
+                      rounded-full px-4 py-2
+                      border border-black/10 bg-white/70
+                      text-[12px] tracking-[0.18em] uppercase text-black/70
+                      hover:bg-white hover:border-black/20 transition
+                    "
+                  >
+                    Sign in
+                  </button>
+                )}
+
+                {session?.user && (
+                  <button
+                    onClick={() => signOut({ callbackUrl: "/" })}
+                    className="
+                      flex items-center gap-2
+                      rounded-full px-4 py-2
+                      border border-black/10 bg-white/70
+                      text-[12px] tracking-[0.18em] uppercase text-black/70
+                      hover:bg-white hover:border-black/20 transition
+                    "
+                  >
+                    <IoMdExit className="text-[16px]" />
+                    Sign out
+                  </button>
+                )}
+              </div>
+            </div>
           </div>
         )}
       </div>
+
+      {/* Drawer */}
+      <CartDrawer isOpen={isCartOpen} onClose={() => setCartOpen(false)} />
     </header>
   );
 }
