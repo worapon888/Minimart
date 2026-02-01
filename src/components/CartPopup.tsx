@@ -1,6 +1,7 @@
 "use client";
 
-import { motion, AnimatePresence } from "framer-motion";
+import { useEffect, useRef, useState } from "react";
+import gsap from "gsap";
 
 export default function CartPopup({
   show,
@@ -9,21 +10,67 @@ export default function CartPopup({
   show: boolean;
   count: number;
 }) {
+  const elRef = useRef<HTMLDivElement | null>(null);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    const el = elRef.current;
+
+    if (show) {
+      // mount แล้วค่อย animate in
+      setMounted(true);
+      requestAnimationFrame(() => {
+        if (!el) return;
+
+        gsap.killTweensOf(el);
+        gsap.fromTo(
+          el,
+          { autoAlpha: 0, y: -10, scale: 0.98, filter: "blur(6px)" },
+          {
+            autoAlpha: 1,
+            y: 0,
+            scale: 1,
+            filter: "blur(0px)",
+            duration: 0.45,
+            ease: "power3.out",
+          },
+        );
+      });
+    } else {
+      // animate out แล้วค่อย unmount
+      if (!el) {
+        setMounted(false);
+        return;
+      }
+
+      gsap.killTweensOf(el);
+      gsap.to(el, {
+        autoAlpha: 0,
+        y: -10,
+        scale: 0.98,
+        filter: "blur(6px)",
+        duration: 0.25,
+        ease: "power2.inOut",
+        onComplete: () => setMounted(false),
+      });
+    }
+  }, [show]);
+
+  if (!mounted) return null;
+
+  const label = `${count} item${count === 1 ? "" : "s"} in cart`;
+
   return (
-    <AnimatePresence>
-      {show && (
-        <motion.div
-          initial={{ opacity: 0, y: -20, scale: 0.95 }}
-          animate={{ opacity: 1, y: 0, scale: 1 }}
-          exit={{ opacity: 0, y: -20, scale: 0.95 }}
-          transition={{ duration: 0.4, ease: "easeOut" }}
-          className="fixed top-4 right-4 bg-white border shadow-lg rounded-full px-4 py-2 flex items-center gap-2 z-50"
-        >
-          <span className="text-black font-medium">
-            🛒 {count} item(s) in cart
-          </span>
-        </motion.div>
-      )}
-    </AnimatePresence>
+    <div
+      ref={elRef}
+      className="fixed top-4 right-4 z-50
+                 rounded-full border border-black/10 bg-white/90 backdrop-blur-md
+                 px-4 py-2 shadow-sm"
+      aria-live="polite"
+    >
+      <span className="text-[13px] font-normal tracking-[0.02em] text-black/80">
+        {label}
+      </span>
+    </div>
   );
 }

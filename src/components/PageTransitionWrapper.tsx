@@ -25,41 +25,65 @@ export default function PageTransitionWrapper({
   useLayoutEffect(() => {
     const currentIndex = routeOrder[pathname] ?? 0;
     const prevIndex = routeOrder[prevPath.current] ?? 0;
+
     setDirection(currentIndex > prevIndex ? 1 : -1);
     prevPath.current = pathname;
-    setKey(pathname); // trigger re-render
+    setKey(pathname);
   }, [pathname]);
 
   useLayoutEffect(() => {
-    if (!wrapperRef.current) return;
-
     const el = wrapperRef.current;
+    if (!el) return;
+
+    // กัน tween ซ้อน
+    gsap.killTweensOf(el);
+
+    // ปรับค่าตามใจ
+    const enterFrom = 28 * direction; // จุดเริ่ม
+    const overshoot = 10 * direction; // เลยเป้าหมายนิดนึง
+    const blurFrom = 10;
 
     const tl = gsap.timeline();
 
-    tl.fromTo(
+    // เซ็ตเริ่มต้น
+    gsap.set(el, {
+      xPercent: enterFrom,
+      opacity: 0,
+      filter: `blur(${blurFrom}px)`,
+      transformOrigin: "50% 50%",
+      willChange: "transform, filter, opacity",
+    });
+
+    // 1) ดึงเข้าแบบเร็ว ๆ เลยเป้าหมายนิด
+    tl.to(el, {
+      xPercent: overshoot,
+      opacity: 1,
+      filter: "blur(2px)",
+      duration: 0.22,
+      ease: "sine.out",
+    });
+
+    // 2) เด้งกลับเข้าที่แบบ jelly
+    tl.to(
       el,
       {
-        xPercent: 50 * direction,
-        opacity: 0,
-        filter: "blur(8px)",
-      },
-      {
         xPercent: 0,
-        opacity: 1,
         filter: "blur(0px)",
-        duration: 0.5,
-        ease: "expo.out", // 👈 ลองเปลี่ยนเป็น curve ที่คุณชอบ
-      }
+        duration: 0.6,
+        ease: "elastic.out(1, 0.6)",
+      },
+      "-=0.05",
     );
 
     return () => {
+      // ออกแบบนุ่ม ๆ (ไม่ elastic จะดูเยอะไป)
+      gsap.killTweensOf(el);
       gsap.to(el, {
-        xPercent: -50 * direction,
+        xPercent: -22 * direction,
         opacity: 0,
-        filter: "blur(6px)",
-        duration: 0.4,
-        ease: "power2.in", // 👈 ease ออกอาจใช้ soft กว่าได้
+        filter: "blur(8px)",
+        duration: 0.28,
+        ease: "power2.in",
       });
     };
   }, [key, direction]);

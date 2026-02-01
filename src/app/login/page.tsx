@@ -12,7 +12,7 @@ export default function LoginPage() {
   const [error, setError] = useState("");
   const router = useRouter();
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError("");
 
@@ -30,101 +30,155 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="flex flex-col min-h-screen">
-      <main className="flex-grow flex items-center justify-center px-4 sm:px-6">
+    <div className="min-h-screen flex items-center justify-center px-6 py-14">
+      <main className="w-full max-w-md">
         <form
           onSubmit={handleSubmit}
-          className="bg-white w-full max-w-md sm:rounded-2xl sm:shadow-md px-6 py-12 sm:p-16 space-y-8"
+          className="
+            rounded-3xl border border-black/10
+            bg-white/70 backdrop-blur-xl
+            px-6 py-10 sm:px-10 sm:py-12
+          "
         >
           {/* Header */}
-          <div className="space-y-1">
-            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
+          <header className="text-center">
+            <p className="text-[11px] uppercase tracking-[0.24em] text-black/45">
+              Account
+            </p>
+            <h1 className="mt-3 text-2xl sm:text-3xl font-normal tracking-tight text-black/85">
               Sign in
             </h1>
-            <p className="text-sm text-gray-500">
-              Sign in to continue shopping
+            <p className="mt-3 text-sm text-black/50">
+              Sign in to continue shopping.
             </p>
-          </div>
+          </header>
 
-          {/* Inputs */}
-          <div className="space-y-4">
+          {/* Fields */}
+          <div className="mt-9 space-y-5">
             {/* Email */}
-            <div className="relative">
-              <label className="absolute -top-2 left-3 text-xs px-1 bg-white text-gray-500">
+            <div>
+              <label className="block text-[11px] uppercase tracking-[0.2em] text-black/45 mb-2">
                 Email
               </label>
-              <input
-                type="email"
-                value={form.email}
-                onChange={(e) => setForm({ ...form, email: e.target.value })}
-                className="w-full border border-gray-300 rounded-lg px-4 py-3 pl-10 text-sm focus:outline-none focus:ring-2 focus:ring-black"
-                placeholder="you@example.com"
-                required
-              />
-              <FiMail className="absolute top-3.5 left-3 text-gray-400" />
+              <div className="relative">
+                <FiMail className="absolute left-4 top-1/2 -translate-y-1/2 text-black/35" />
+                <input
+                  type="email"
+                  value={form.email}
+                  onChange={(e) => setForm({ ...form, email: e.target.value })}
+                  placeholder="you@example.com"
+                  required
+                  className="
+                    w-full rounded-2xl border border-black/10
+                    bg-white/70 px-4 py-3 pl-11
+                    text-[13px] text-black/75
+                    outline-none transition
+                    focus:ring-2 focus:ring-black/10
+                  "
+                />
+              </div>
             </div>
 
             {/* Password */}
-            <div className="relative">
-              <label className="absolute -top-2 left-3 text-xs px-1 bg-white text-gray-500">
+            <div>
+              <label className="block text-[11px] uppercase tracking-[0.2em] text-black/45 mb-2">
                 Password
               </label>
-              <input
-                type="password"
-                value={form.password}
-                onChange={(e) => setForm({ ...form, password: e.target.value })}
-                className="w-full border border-gray-300 rounded-lg px-4 py-3 pl-10 text-sm focus:outline-none focus:ring-2 focus:ring-black"
-                placeholder="••••••"
-                required
-              />
-              <FiLock className="absolute top-3.5 left-3 text-gray-400" />
+              <div className="relative">
+                <FiLock className="absolute left-4 top-1/2 -translate-y-1/2 text-black/35" />
+                <input
+                  type="password"
+                  value={form.password}
+                  onChange={(e) =>
+                    setForm({ ...form, password: e.target.value })
+                  }
+                  placeholder="••••••"
+                  required
+                  className="
+                    w-full rounded-2xl border border-black/10
+                    bg-white/70 px-4 py-3 pl-11
+                    text-[13px] text-black/75
+                    outline-none transition
+                    focus:ring-2 focus:ring-black/10
+                  "
+                />
+              </div>
             </div>
 
-            {error && <p className="text-red-500 text-sm">{error}</p>}
+            {/* Error */}
+            {error && (
+              <p className="text-[12px] text-red-600/80 leading-relaxed">
+                {error}
+              </p>
+            )}
           </div>
 
-          {/* Sign in */}
+          {/* Primary */}
           <button
             type="submit"
-            className="w-full bg-black text-white py-3 rounded-lg font-medium hover:opacity-90 transition cursor-pointer"
+            className="
+              mt-8 w-full rounded-full
+              bg-black text-white
+              py-3 text-[12px] uppercase tracking-[0.22em]
+              hover:bg-black/85 transition
+              cursor-pointer
+            "
           >
             Sign in
           </button>
 
           {/* Divider */}
-          <div className="flex items-center gap-4 text-sm text-gray-400">
-            <div className="flex-1 h-px bg-gray-300" />
-            or
-            <div className="flex-1 h-px bg-gray-300" />
+          <div className="mt-8 flex items-center gap-4">
+            <div className="h-px flex-1 bg-black/10" />
+            <span className="text-[11px] uppercase tracking-[0.24em] text-black/35">
+              or
+            </span>
+            <div className="h-px flex-1 bg-black/10" />
           </div>
 
           {/* Google */}
           <button
             type="button"
             onClick={() => signIn("google")}
-            className="w-full flex items-center cursor-pointer justify-center gap-3 bg-[#fff] border border-gray-300 text-gray-800 font-medium py-2 rounded-lg hover:shadow-md hover:scale-[1.02] transition-all"
+            className="
+              mt-6 w-full
+              flex items-center justify-center gap-3
+              rounded-full border border-black/10
+              bg-white/70
+              py-3
+              text-[12px] uppercase tracking-[0.18em]
+              text-black/70
+              hover:bg-white hover:border-black/20
+              transition
+              cursor-pointer
+            "
           >
             <Image
               src="https://img.icons8.com/color/48/000000/google-logo.png"
               alt="Google"
-              width={20}
-              height={20}
-              className="w-5 h-5"
+              width={18}
+              height={18}
+              className="h-[18px] w-[18px]"
             />
-            <span className="text-sm font-semibold">Continue with Google</span>
+            Continue with Google
           </button>
 
-          {/* Register link */}
-          <p className="text-center text-sm text-gray-500">
+          {/* Register */}
+          <p className="mt-8 text-center text-sm text-black/50">
             Don&apos;t have an account?{" "}
             <Link
               href="/register"
-              className="text-blue-600 hover:underline cursor-pointer"
+              className="text-black/75 underline underline-offset-4 hover:text-black transition"
             >
               Register
             </Link>
           </p>
         </form>
+
+        {/* Optional tiny footer */}
+        <p className="mt-6 text-center text-[12px] text-black/35">
+          MinimalMart — the calm side of commerce.
+        </p>
       </main>
     </div>
   );

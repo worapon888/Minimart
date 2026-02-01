@@ -5,106 +5,175 @@ import { useRouter } from "next/navigation";
 import { FiMail, FiLock, FiUser } from "react-icons/fi";
 import Image from "next/image";
 import { signIn } from "next-auth/react";
+import Link from "next/link";
+
+type RegisterForm = {
+  name: string;
+  email: string;
+  password: string;
+};
 
 export default function RegisterPage() {
-  const [form, setForm] = useState({
+  const [form, setForm] = useState<RegisterForm>({
     name: "",
     email: "",
     password: "",
   });
+
   const [submitted, setSubmitted] = useState(false);
   const router = useRouter();
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if (submitted) return;
 
-    // 🔐 ต้องเชื่อม backend จริงในระบบ production
+    // 🔐 production: connect real backend
     setSubmitted(true);
 
     setTimeout(() => {
       router.push("/login");
-    }, 1500);
+    }, 1200);
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4 sm:px-6">
+    <div className="min-h-screen  px-6 py-16 flex items-center justify-center">
       <form
         onSubmit={handleSubmit}
-        className="bg-white w-full max-w-md sm:rounded-2xl sm:shadow-md px-6 py-12 sm:p-16 space-y-8"
+        className="
+          w-full max-w-md
+          rounded-3xl border border-black/10
+          bg-white/70 backdrop-blur-xl
+          px-6 py-10 sm:px-10 sm:py-12
+        "
       >
         {/* Header */}
-        <div className="space-y-1">
-          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
+        <div className="text-center">
+          <p className="text-[11px] uppercase tracking-[0.24em] text-black/45">
             Create account
+          </p>
+          <h1 className="mt-3 text-2xl sm:text-3xl font-normal tracking-tight text-black/85">
+            Welcome to MinimalMart
           </h1>
-          <p className="text-sm text-gray-500">
-            Get started with your shopping journey
+          <p className="mt-2 text-sm text-black/55">
+            Keep it simple — start your shopping journey.
           </p>
         </div>
 
-        {/* Inputs */}
-        <div className="space-y-4">
+        {/* Fields */}
+        <div className="mt-8 space-y-4">
           {/* Name */}
-          <div className="relative">
-            <label className="absolute -top-2 left-3 text-xs px-1 bg-white text-gray-500">
+          <div>
+            <label className="block text-[11px] uppercase tracking-[0.2em] text-black/45">
               Name
             </label>
-            <input
-              type="text"
-              value={form.name}
-              onChange={(e) => setForm({ ...form, name: e.target.value })}
-              className="w-full border border-gray-300 rounded-lg px-4 py-3 pl-10 text-sm focus:outline-none focus:ring-2 focus:ring-black"
-              placeholder="John Doe"
-              required
-            />
-            <FiUser className="absolute top-3.5 left-3 text-gray-400" />
+            <div className="mt-2 relative">
+              <FiUser className="absolute left-4 top-1/2 -translate-y-1/2 text-black/40" />
+              <input
+                type="text"
+                value={form.name}
+                onChange={(e) =>
+                  setForm((p) => ({ ...p, name: e.target.value }))
+                }
+                placeholder="John Doe"
+                required
+                className="
+                  w-full rounded-2xl
+                  border border-black/10 bg-white/70
+                  px-11 py-3 text-sm text-black/80
+                  placeholder:text-black/35
+                  outline-none
+                  focus:border-black/25 focus:ring-2 focus:ring-black/10
+                  transition
+                "
+              />
+            </div>
           </div>
 
           {/* Email */}
-          <div className="relative">
-            <label className="absolute -top-2 left-3 text-xs px-1 bg-white text-gray-500">
+          <div>
+            <label className="block text-[11px] uppercase tracking-[0.2em] text-black/45">
               Email
             </label>
-            <input
-              type="email"
-              value={form.email}
-              onChange={(e) => setForm({ ...form, email: e.target.value })}
-              className="w-full border border-gray-300 rounded-lg px-4 py-3 pl-10 text-sm focus:outline-none focus:ring-2 focus:ring-black"
-              placeholder="you@example.com"
-              required
-            />
-            <FiMail className="absolute top-3.5 left-3 text-gray-400" />
+            <div className="mt-2 relative">
+              <FiMail className="absolute left-4 top-1/2 -translate-y-1/2 text-black/40" />
+              <input
+                type="email"
+                value={form.email}
+                onChange={(e) =>
+                  setForm((p) => ({ ...p, email: e.target.value }))
+                }
+                placeholder="you@example.com"
+                required
+                className="
+                  w-full rounded-2xl
+                  border border-black/10 bg-white/70
+                  px-11 py-3 text-sm text-black/80
+                  placeholder:text-black/35
+                  outline-none
+                  focus:border-black/25 focus:ring-2 focus:ring-black/10
+                  transition
+                "
+              />
+            </div>
           </div>
 
           {/* Password */}
-          <div className="relative">
-            <label className="absolute -top-2 left-3 text-xs px-1 bg-white text-gray-500">
+          <div>
+            <label className="block text-[11px] uppercase tracking-[0.2em] text-black/45">
               Password
             </label>
-            <input
-              type="password"
-              value={form.password}
-              onChange={(e) => setForm({ ...form, password: e.target.value })}
-              className="w-full border border-gray-300 rounded-lg px-4 py-3 pl-10 text-sm focus:outline-none focus:ring-2 focus:ring-black"
-              placeholder="••••••"
-              required
-            />
-            <FiLock className="absolute top-3.5 left-3 text-gray-400" />
+            <div className="mt-2 relative">
+              <FiLock className="absolute left-4 top-1/2 -translate-y-1/2 text-black/40" />
+              <input
+                type="password"
+                value={form.password}
+                onChange={(e) =>
+                  setForm((p) => ({ ...p, password: e.target.value }))
+                }
+                placeholder="••••••••"
+                required
+                className="
+                  w-full rounded-2xl
+                  border border-black/10 bg-white/70
+                  px-11 py-3 text-sm text-black/80
+                  placeholder:text-black/35
+                  outline-none
+                  focus:border-black/25 focus:ring-2 focus:ring-black/10
+                  transition
+                "
+              />
+            </div>
           </div>
         </div>
 
-        {/* Google Sign-in */}
+        {/* Divider */}
+        <div className="my-7 flex items-center gap-4">
+          <div className="h-px flex-1 bg-black/10" />
+          <span className="text-[11px] uppercase tracking-[0.24em] text-black/35">
+            or
+          </span>
+          <div className="h-px flex-1 bg-black/10" />
+        </div>
+
+        {/* Google */}
         <button
           type="button"
           onClick={() => signIn("google")}
-          className="w-full flex items-center justify-center gap-3 cursor-pointer bg-white border border-gray-300 text-gray-800 font-medium py-2 rounded-lg hover:bg-gray-100 transition"
+          className="
+            w-full inline-flex items-center justify-center gap-3
+            rounded-full border border-black/10 bg-white/60
+            py-3 text-[12px] uppercase tracking-[0.22em]
+            text-black/70
+            hover:bg-white hover:text-black/80
+            transition
+          "
         >
           <Image
             src="https://img.icons8.com/?size=100&id=17949&format=png&color=000000"
             alt="Google"
-            width={20}
-            height={20}
-            className="w-5 h-5"
+            width={18}
+            height={18}
+            className="opacity-70"
           />
           Continue with Google
         </button>
@@ -112,20 +181,27 @@ export default function RegisterPage() {
         {/* Submit */}
         <button
           type="submit"
-          className="w-full bg-black text-white py-3 rounded-lg font-medium hover:opacity-90 transition cursor-pointer"
+          disabled={submitted}
+          className={`
+            mt-4 w-full rounded-full
+            bg-black text-white
+            py-3 text-[12px] uppercase tracking-[0.22em]
+            hover:bg-black/85 transition
+            ${submitted ? "opacity-70 cursor-not-allowed" : "cursor-pointer"}
+          `}
         >
           {submitted ? "Creating account..." : "Register"}
         </button>
 
-        {/* Link to Login */}
-        <p className="text-center text-sm text-gray-500">
+        {/* Footer link */}
+        <p className="mt-6 text-center text-sm text-black/55">
           Already have an account?{" "}
-          <span
-            onClick={() => router.push("/login")}
-            className="text-blue-600 hover:underline cursor-pointer"
+          <Link
+            href="/login"
+            className="text-black/75 hover:text-black underline underline-offset-4"
           >
             Sign in
-          </span>
+          </Link>
         </p>
       </form>
     </div>

@@ -1,9 +1,8 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import * as AvatarPrimitive from "@radix-ui/react-avatar"
-
-import { cn } from "@/lib/utils"
+import * as React from "react";
+import * as AvatarPrimitive from "@radix-ui/react-avatar";
+import { cn } from "@/lib/utils";
 
 function Avatar({
   className,
@@ -13,12 +12,13 @@ function Avatar({
     <AvatarPrimitive.Root
       data-slot="avatar"
       className={cn(
-        "relative flex size-8 shrink-0 overflow-hidden rounded-full",
-        className
+        // เบาลง + มีเส้นบางแทนเงา
+        "relative flex size-7 shrink-0 overflow-hidden rounded-full ring-1 ring-black/10 bg-white",
+        className,
       )}
       {...props}
     />
-  )
+  );
 }
 
 function AvatarImage({
@@ -28,10 +28,14 @@ function AvatarImage({
   return (
     <AvatarPrimitive.Image
       data-slot="avatar-image"
-      className={cn("aspect-square size-full", className)}
+      className={cn(
+        // เน้นให้ภาพเนียน ไม่ต้อง effect เยอะ
+        "aspect-square size-full object-cover",
+        className,
+      )}
       {...props}
     />
-  )
+  );
 }
 
 function AvatarFallback({
@@ -42,12 +46,13 @@ function AvatarFallback({
     <AvatarPrimitive.Fallback
       data-slot="avatar-fallback"
       className={cn(
-        "bg-muted flex size-full items-center justify-center rounded-full",
-        className
+        // พื้นหลังโปร่ง + ตัวอักษรบาง
+        "flex size-full items-center justify-center rounded-full bg-black/5 text-[11px] font-light tracking-wide text-black/70",
+        className,
       )}
       {...props}
     />
-  )
+  );
 }
 
-export { Avatar, AvatarImage, AvatarFallback }
+export { Avatar, AvatarImage, AvatarFallback };

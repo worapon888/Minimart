@@ -7,7 +7,7 @@ export async function GET() {
 
   for (const item of products) {
     if (!categoriesMap.has(item.category)) {
-      categoriesMap.set(item.category, item.image);
+      categoriesMap.set(item.category, item.images);
     }
   }
 
@@ -15,7 +15,7 @@ export async function GET() {
     ([category, image]) => ({
       category,
       image,
-    })
+    }),
   );
 
   return Response.json(categories);

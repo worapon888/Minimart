@@ -1,39 +1,67 @@
 "use client";
 
-import { FaTruck, FaRegLightbulb } from "react-icons/fa";
-import { PiAppWindowLight } from "react-icons/pi"; // ใช้เป็นไอคอนดีไซน์ใกล้เคียง aesthetic
+import { FaTruck } from "react-icons/fa";
+import { FaRegLightbulb } from "react-icons/fa";
+import { PiAppWindowLight } from "react-icons/pi";
 
 export default function WhyMinimalMart() {
+  const items = [
+    {
+      icon: <FaRegLightbulb />,
+      title: "Curated selection",
+      desc: "Only what’s useful, nothing extra.",
+    },
+    {
+      icon: <FaTruck />,
+      title: "Careful delivery",
+      desc: "Packed clean. Delivered on time.",
+    },
+    {
+      icon: <PiAppWindowLight />,
+      title: "Quiet design",
+      desc: "Simple forms that fit any space.",
+    },
+  ];
+
   return (
-    <section className="py-20 px-6 text-center ">
-      <h2 className="text-4xl sm:text-7xl font-bold text-gray-800 mb-16">
-        <span className="bg-gradient-to-b from-black to-gray-400 bg-clip-text text-transparent">
-          Why MinimalMart
-        </span>
-      </h2>
-
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-12 max-w-6xl mx-auto">
-        {/* Feature 1 */}
-        <div className="space-y-2">
-          <FaRegLightbulb className="mx-auto text-6xl " />
-          <h3 className="text-2xl font-medium">Curated with intention</h3>
-          <p className="font-normal text-lg">→ Every piece serves a purpose.</p>
-        </div>
-
-        {/* Feature 2 */}
-        <div className="space-y-2">
-          <FaTruck className="mx-auto text-6xl " />
-          <h3 className="text-2xl font-medium">Mindful delivery</h3>
-          <p className="font-normal text-lg">→ Quick, clean, caring.</p>
-        </div>
-
-        {/* Feature 3 */}
-        <div className="space-y-2">
-          <PiAppWindowLight className="mx-auto text-6xl" />
-          <h3 className="text-2xl font-medium">Timeless aesthetics</h3>
-          <p className="font-normal text-lg">
-            &quot;Simple, elegant, nd never out of style.&quot;
+    <section className="py-20 px-6">
+      <div className="max-w-6xl mx-auto">
+        {/* Header */}
+        <div className="text-center mb-14">
+          <p className="text-[11px] uppercase tracking-[0.32em] text-neutral-500">
+            Why
           </p>
+
+          <h2 className="mt-3 text-3xl sm:text-5xl font-light tracking-[-0.02em] text-neutral-900">
+            MinimalMart
+          </h2>
+
+          <p className="mt-4 text-sm sm:text-base text-neutral-600 leading-relaxed">
+            Fewer choices. Better ones.
+          </p>
+        </div>
+
+        {/* Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+          {items.map((it) => (
+            <div
+              key={it.title}
+              className="rounded-2xl border border-neutral-200 bg-white p-7 text-center
+                         hover:bg-neutral-50 transition"
+            >
+              <div className="mx-auto mb-5 flex h-12 w-12 items-center justify-center rounded-full border border-neutral-200 bg-white text-neutral-700">
+                <span className="text-xl">{it.icon}</span>
+              </div>
+
+              <h3 className="text-[15px] font-normal tracking-[0.02em] text-neutral-900">
+                {it.title}
+              </h3>
+
+              <p className="mt-2 text-sm text-neutral-600 leading-relaxed">
+                {it.desc}
+              </p>
+            </div>
+          ))}
         </div>
       </div>
     </section>

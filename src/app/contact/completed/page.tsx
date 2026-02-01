@@ -1,48 +1,47 @@
 "use client";
 
-import Confetti from "react-confetti";
-import { useWindowSize } from "react-use";
 import Link from "next/link";
-import { useEffect, useState } from "react";
 
 export default function ContactCompletedPage() {
-  const { width, height } = useWindowSize();
-  const [showConfetti, setShowConfetti] = useState(false);
-
-  useEffect(() => {
-    setShowConfetti(true);
-  }, []);
-
   return (
-    <div className="relative">
-      {/* 🎉 Confetti เต็มจอ */}
-      {showConfetti && (
-        <div className="fixed top-0 left-0 w-screen h-screen z-50 pointer-events-none">
-          <Confetti
-            width={width}
-            height={height}
-            numberOfPieces={300}
-            recycle={false}
-          />
-        </div>
-      )}
+    <section className="px-6 py-20 sm:py-28">
+      <div className="mx-auto w-full max-w-xl text-center">
+        <p className="text-[11px] uppercase tracking-[0.28em] text-black/45">
+          Message sent
+        </p>
 
-      {/* ✅ ส่วนหลักของหน้า */}
-      <section className="max-w-xl mx-auto px-6 py-24 text-center space-y-8">
-        <div className="text-5xl">✅</div>
-        <h2 className="text-3xl font-semibold">Thank You!</h2>
-        <p className="text-gray-600 text-lg">
+        <div className="mt-8 flex items-center justify-center">
+          <div className="flex h-12 w-12 items-center justify-center rounded-full border border-black/15 bg-white/70 text-black/70">
+            ✓
+          </div>
+        </div>
+
+        <h1 className="mt-6 text-3xl sm:text-4xl font-light tracking-tight text-black">
+          Thank you
+        </h1>
+
+        <p className="mt-4 text-base sm:text-lg leading-relaxed text-black/60">
           We’ve received your message and will get back to you as soon as
           possible.
         </p>
 
+        <div className="my-10 h-px w-full bg-black/10" />
+
         <Link
           href="/"
-          className="inline-block mt-6 px-6 py-2 rounded-full bg-black text-white hover:bg-gray-800 transition"
+          className="
+            inline-flex items-center justify-center
+            rounded-full border border-black/20
+            bg-white/70 px-6 py-3
+            text-[12px] uppercase tracking-[0.24em]
+            text-black/70
+            transition
+            hover:bg-white hover:text-black
+          "
         >
-          Back to Home
+          Back to home
         </Link>
-      </section>
-    </div>
+      </div>
+    </section>
   );
 }

@@ -2,45 +2,50 @@
 
 import Link from "next/link";
 import { useEffect, useRef } from "react";
-import confetti from "canvas-confetti";
 import gsap from "gsap";
 
 export default function OrderSuccessPage() {
-  const containerRef = useRef(null);
-  const iconRef = useRef(null);
-  const buttonRef = useRef(null);
+  const containerRef = useRef<HTMLDivElement | null>(null);
+  const iconRef = useRef<HTMLDivElement | null>(null);
+  const buttonRef = useRef<HTMLAnchorElement | null>(null);
 
   useEffect(() => {
-    confetti({
-      particleCount: 150,
-      spread: 80,
-      origin: { y: 0.6 },
-    });
+    if (!containerRef.current) return;
 
     const ctx = gsap.context(() => {
-      gsap.from(".fade-top", {
-        opacity: 0,
-        y: -30,
-        duration: 1,
-        ease: "power3.out",
-      });
+      gsap.fromTo(
+        ".fade-top",
+        { autoAlpha: 0, y: -10 },
+        { autoAlpha: 1, y: 0, duration: 0.55, ease: "power2.out" },
+      );
 
-      gsap.from(iconRef.current, {
-        scale: 0,
-        opacity: 0,
-        duration: 0.6,
-        delay: 0.3,
-        ease: "back.out(1.7)",
-      });
+      if (iconRef.current) {
+        gsap.fromTo(
+          iconRef.current,
+          { autoAlpha: 0, scale: 0.98, y: 6 },
+          {
+            autoAlpha: 1,
+            scale: 1,
+            y: 0,
+            duration: 0.6,
+            delay: 0.1,
+            ease: "power2.out",
+          },
+        );
+      }
 
-      gsap.from([".fade-up", buttonRef.current], {
-        opacity: 0,
-        y: 20,
-        duration: 0.8,
-        stagger: 0.2,
-        delay: 0.6,
-        ease: "power2.out",
-      });
+      gsap.fromTo(
+        [".fade-up", buttonRef.current].filter(Boolean),
+        { autoAlpha: 0, y: 10 },
+        {
+          autoAlpha: 1,
+          y: 0,
+          duration: 0.55,
+          stagger: 0.08,
+          delay: 0.16,
+          ease: "power2.out",
+        },
+      );
     }, containerRef);
 
     return () => ctx.revert();
@@ -49,31 +54,78 @@ export default function OrderSuccessPage() {
   return (
     <div
       ref={containerRef}
-      className="min-h-screen flex flex-col justify-center items-center text-center bg-[#f9f9f9] px-4 sm:px-6 py-12 space-y-6"
+      className="
+        min-h-screen px-6 py-16
+        flex items-center justify-center
+      
+      "
     >
-      <h1 className="text-3xl sm:text-4xl font-semibold text-gray-800 fade-top">
-        Order Confirmation
-      </h1>
-
-      <p className="text-base sm:text-lg text-gray-600 max-w-md fade-up">
-        Your order has been confirmed. A receipt has been sent to your email.
-      </p>
-
-      <div ref={iconRef} className="text-6xl sm:text-7xl text-green-600">
-        ✓
-      </div>
-
-      <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 fade-up">
-        Thank you
-      </h2>
-
-      <Link
-        ref={buttonRef}
-        href="/products"
-        className="inline-block bg-black text-white px-6 py-3 rounded-full text-sm sm:text-base hover:opacity-90 transition"
+      <section
+        className="
+          w-full max-w-md text-center
+          rounded-3xl border border-black/10
+          bg-white/70 backdrop-blur-xl
+          px-6 py-10 sm:px-10 sm:py-12
+        "
       >
-        Continue Shopping
-      </Link>
+        <p className="text-[11px] uppercase tracking-[0.24em] text-black/45 fade-top">
+          Order status
+        </p>
+
+        <h1 className="mt-3 text-2xl sm:text-3xl font-normal tracking-tight text-black/85 fade-top">
+          Order confirmed
+        </h1>
+
+        <p className="mt-4 text-sm sm:text-[15px] leading-relaxed text-black/55 fade-up">
+          Your order has been confirmed. A receipt has been sent to your email.
+        </p>
+
+        <div
+          ref={iconRef}
+          className="
+            mt-7 mx-auto
+            grid place-items-center
+            h-14 w-14 rounded-full
+            border border-black/10
+            bg-white/70
+            text-black/70
+          "
+          aria-hidden="true"
+        >
+          ✓
+        </div>
+
+        <h2 className="mt-5 text-xl sm:text-2xl font-normal tracking-tight text-black/85 fade-up">
+          Thank you
+        </h2>
+
+        <Link
+          ref={buttonRef}
+          href="/products"
+          className="
+            mt-7 inline-flex items-center justify-center
+            w-full rounded-full
+            bg-black text-white
+            py-3 text-[12px] uppercase tracking-[0.22em]
+            hover:bg-black/85 transition
+          "
+        >
+          Continue shopping
+        </Link>
+
+        <Link
+          href="/"
+          className="
+            mt-3 inline-flex items-center justify-center
+            w-full rounded-full
+            border border-black/10 bg-white/60
+            py-3 text-[12px] uppercase tracking-[0.22em]
+            text-black/60 hover:text-black/75 hover:bg-white transition
+          "
+        >
+          Back to home
+        </Link>
+      </section>
     </div>
   );
 }

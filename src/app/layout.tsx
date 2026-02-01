@@ -1,12 +1,12 @@
 import type { Metadata } from "next";
-import "./globals.css";
 import { Gotham } from "@/app/fonts";
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
 import ClientProviders from "./ClientProviders";
 import PageTransitionWrapper from "@/components/PageTransitionWrapper";
 import { Toaster } from "react-hot-toast";
-
+import SmoothScroll from "@/components/SmoothScroll";
+import "./globals.css";
 export const metadata: Metadata = {
   title: {
     default: "MinimalMart – Motion-first E-commerce",
@@ -23,7 +23,7 @@ export const metadata: Metadata = {
     "Tailwind CSS",
     "UX/UI",
   ],
-  authors: [{ name: "Code404", url: "https://github.com/yourgithub" }],
+  authors: [{ name: "Worapon.dev", url: "https://github.com/yourgithub" }],
   creator: "Code404",
   metadataBase: new URL("https://minimart-three.vercel.app"),
   openGraph: {
@@ -65,6 +65,7 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${Gotham.variable}`}>
       <body className="min-h-screen flex flex-col font-gotham">
+        <SmoothScroll />
         <ClientProviders>
           <Header />
 

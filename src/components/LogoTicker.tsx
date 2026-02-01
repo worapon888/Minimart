@@ -26,9 +26,10 @@ export default function LogoTicker() {
   return (
     <section className="py-24 overflow-x-clip">
       <div className="container">
-        <h3 className="text-center text-xl">
+        <h3 className="text-center text-sm md:text-base font-light tracking-[0.2em] uppercase text-gray-500">
           Already chosen by these market leaders
         </h3>
+
         <div className="mt-12 overflow-hidden [mask-image:linear-gradient(to_right,transparent,black_10%,black_90%,transparent)]">
           <div ref={tickerRef} className="flex gap-24 pr-24 w-max">
             {Array.from({ length: 2 }).map((_, i) => (
