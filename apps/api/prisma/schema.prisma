@@ -1,0 +1,250 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String?
+  role      UserRole @default(CUSTOMER)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  orders    Order[]
+}
+
+model Product {
+  id                   String             @id @default(cuid())
+  sku                  String             @unique
+  title                String
+  description          String?
+  imageUrl             String?
+  priceCents           Int
+  currency             String             @default("USD")
+  status               ProductStatus      @default(ACTIVE)
+  createdAt            DateTime           @default(now())
+  updatedAt            DateTime           @updatedAt
+  availabilityStatus   String?
+  brand                String?
+  category             String?
+  discountPercentage   Float?
+  images               String[]           @default([])
+  minimumOrderQuantity Int?
+  rating               Float?
+  returnPolicy         String?
+  shippingInformation  String?
+  tags                 String[]           @default([])
+  thumbnail            String?
+  warrantyInformation  String?
+  weight               Int?
+  inventory            Inventory?         @relation("ProductInventory")
+  dimensions           ProductDimensions? @relation("ProductDimensions")
+  meta                 ProductMeta?       @relation("ProductMeta")
+  reviews              Review[]
+  orderItems           OrderItem[]
+  flashSaleItem        FlashSaleItem?
+
+  @@index([status])
+  @@index([priceCents])
+  @@index([category])
+}
+
+model Inventory {
+  id        String   @id @default(cuid())
+  productId String   @unique
+  onHand    Int      @default(0)
+  reserved  Int      @default(0)
+  version   Int      @default(1)
+  updatedAt DateTime @updatedAt
+  product   Product  @relation("ProductInventory", fields: [productId], references: [id], onDelete: Cascade)
+}
+
+model ProductDimensions {
+  id        String  @id @default(cuid())
+  productId String  @unique
+  width     Float
+  height    Float
+  depth     Float
+  product   Product @relation("ProductDimensions", fields: [productId], references: [id], onDelete: Cascade)
+}
+
+model ProductMeta {
+  id        String   @id @default(cuid())
+  productId String   @unique
+  createdAt DateTime
+  updatedAt DateTime @updatedAt
+  barcode   String?
+  qrCode    String?
+  product   Product  @relation("ProductMeta", fields: [productId], references: [id], onDelete: Cascade)
+}
+
+model Review {
+  id            String   @id @default(cuid())
+  productId     String
+  rating        Int
+  comment       String
+  date          DateTime
+  reviewerName  String
+  reviewerEmail String
+  product       Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@index([productId])
+}
+
+enum UserRole {
+  CUSTOMER
+  ADMIN
+}
+
+enum ProductStatus {
+  ACTIVE
+  DRAFT
+  ARCHIVED
+}
+
+enum ReservationStatus {
+  ACTIVE
+  EXPIRED
+  CONFIRMED
+  CANCELED
+}
+
+model FlashSaleItem {
+  id        String @id @default(cuid())
+  productId String @unique
+
+  product Product @relation(fields: [productId], references: [id], onDelete: Restrict)
+
+  stock    Int
+  reserved Int @default(0)
+  sold     Int @default(0)
+
+  startsAt DateTime?
+  endsAt   DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  reservations Reservation[]
+
+  @@index([productId]) // (มีอยู่แล้ว)
+  @@index([endsAt])
+  @@index([startsAt, endsAt])
+}
+
+model Reservation {
+  id              String            @id @default(cuid())
+  flashSaleItemId String
+  qty             Int
+  status          ReservationStatus @default(ACTIVE)
+  expiresAt       DateTime
+
+  // ✅ แนะนำมาก: กันการยิงซ้ำจาก client/network retry (idempotency)
+  requestId String? @unique
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  flashSaleItem FlashSaleItem @relation(fields: [flashSaleItemId], references: [id], onDelete: Cascade)
+  order         Order?
+
+  @@index([flashSaleItemId, status])
+  @@index([status, expiresAt])
+}
+
+enum OrderStatus {
+  PENDING
+  PAID
+  CANCELED
+  EXPIRED
+}
+
+model Order {
+  id     String      @id @default(cuid())
+  status OrderStatus @default(PENDING)
+
+  // ✅ link reservation (1 reservation -> 1 order)
+  reservationId String?      @unique
+  reservation   Reservation? @relation(fields: [reservationId], references: [id], onDelete: SetNull)
+
+  // ✅ optional: ถ้ามี user ใน auth แล้วค่อยใส่ตอนเริ่ม checkout หรือหลัง login
+  userId String?
+  user   User?   @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  currency      String @default("USD")
+  subtotalCents Int
+  totalCents    Int
+
+  // ✅ กัน client ยิงซ้ำ (network retry / double click)
+  idempotencyKey String? @unique
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  items         OrderItem[]
+  paymentIntent PaymentIntent?
+}
+
+model OrderItem {
+  id      String @id @default(cuid())
+  orderId String
+  order   Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  productId String
+  product   Product @relation(fields: [productId], references: [id], onDelete: Restrict)
+
+  qty            Int
+  unitPriceCents Int
+  lineTotalCents Int
+
+  createdAt DateTime @default(now())
+
+  @@index([orderId])
+  @@index([productId])
+}
+
+enum PaymentIntentStatus {
+  REQUIRES_PAYMENT_METHOD
+  PROCESSING
+  SUCCEEDED
+  FAILED
+}
+
+model PaymentIntent {
+  id           String              @id @default(cuid())
+  orderId      String              @unique
+  amount       Int
+  currency     String
+  status       PaymentIntentStatus @default(REQUIRES_PAYMENT_METHOD)
+  clientSecret String              @unique
+  createdAt    DateTime            @default(now())
+  updatedAt    DateTime            @updatedAt
+
+  order Order @relation(fields: [orderId], references: [id])
+}
+
+model WebhookEvent {
+  id         String   @id @default(cuid())
+  provider   String
+  eventId    String
+  type       String
+  payload    Json
+  receivedAt DateTime @default(now())
+
+  @@unique([provider, eventId])
+  @@index([provider, receivedAt])
+}
+
+model IdempotencyKey {
+  id          String   @id @default(cuid())
+  scope       String // "checkout.pay"
+  key         String
+  requestHash String
+  response    Json
+  createdAt   DateTime @default(now())
+
+  @@unique([scope, key])
+}
