@@ -1,0 +1,15 @@
+{
+  "name": "minimart-monorepo",
+  "private": true,
+  "workspaces": [
+    "apps/web",
+    "apps/api",
+    "packages/*"
+  ],
+  "scripts": {
+    "vercel-build": "npm run build --workspace apps/web"
+  },
+  "devDependencies": {
+    "next": "^15.5.7"
+  }
+}
