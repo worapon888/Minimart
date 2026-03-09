@@ -7,7 +7,7 @@
     "packages/*"
   ],
   "scripts": {
-    "vercel-build": "npm run build --workspace apps/web"
+    "vercel-build": "npm run build --workspace apps/web && node scripts/vercel-sync-next-output.cjs"
   },
   "devDependencies": {
     "next": "^15.5.7"
