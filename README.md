@@ -1,42 +1,138 @@
-![thumnail_mininal](https://github.com/user-attachments/assets/002e8842-1f52-4773-97eb-e843fe73d9fe)
+# MinimalMart Monorepo
 
+MinimalMart เป็นโปรเจกต์ e-commerce แบบแยกเป็น 2 แอปใน monorepo:
+- `apps/web`: Next.js storefront + dashboard UI
+- `apps/api`: NestJS API + Prisma + PostgreSQL
 
-🧵 [Project Showcase] MinimalMart – Motion-first E-Commerce UI with GSAP + Next.js 15
-🧵 [Project Showcase] MinimalMart – Motion-first E-Commerce UI with GSAP + Next.js 15
-MinimalMart is a solo-built e-commerce frontend concept, designed to explore what a motion-first, user-centric shopping experience could look like in 2025.
+## Project Structure
 
-⚙️ Tech Stack
-Next.js 15 (App Router) – for modern routing and file-based structure
+```text
+Minimart/
+  apps/
+    web/   # Next.js 15
+    api/   # NestJS + Prisma
+  docker-compose.yml
+```
 
-Tailwind CSS 4.0 – with custom breakpoints and container logic
+## Prerequisites
 
-GSAP – powering smooth motion, soft-shake effects, and animated cart interactions
+- Node.js 20+
+- npm 10+
+- Docker Desktop
 
-TypeScript – with modular state and strict types
+## Environment Files
 
-🧠 Key Features
-🛒 Animated Add-to-Cart with floating cart preview
+ตั้งค่า env อย่างน้อยตามนี้:
 
-🎯 Real-time filter/search with URL params + local state
+- `.env` (root, ใช้กับ docker compose)
+- `apps/web/.env.local`
+- `apps/api/.env`
+- `apps/api/.env.test` (ใช้สำหรับ e2e tests)
 
-📱 Responsive layout with layout-specific overrides
+หมายเหตุ:
+- ห้ามใช้ production secrets ในไฟล์ local/test
+- `apps/api/.env.test` ต้องมีค่าที่จำเป็นครบ (เช่น `JWT_SECRET`, `JWT_REFRESH_SECRET`, `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `DATABASE_URL`)
 
-🌐 SEO-ready: metadata, OG image, alt tags, sitemap.xml
+เริ่มต้นได้เร็วด้วยไฟล์ตัวอย่าง:
 
-🎯 Design Philosophy
-MinimalMart is not just about “a clean UI.”
-It's about building an interface that feels alive — through soft, thoughtful motion that doesn’t get in the user’s way, but helps them engage with the product and flow naturally through each interaction.
+```bash
+cp .env.example .env
+cp apps/api/.env.example apps/api/.env
+cp apps/api/.env.test.example apps/api/.env.test
+cp apps/web/.env.local.example apps/web/.env.local
+```
 
-📦 Live Demo
-🔗 https://minimart-three.vercel.app
+## Install Dependencies
 
-🙋‍♂️ Looking For:
-Feedback on motion flow & UX design
+ติดตั้งแยกแต่ละแอป:
 
-Devs who are into design systems + animation + solo craft
+```bash
+cd apps/api
+npm install
 
-Conversations around how motion can shape perceived quality
+cd ../web
+npm install
+```
 
-If you're curious to see more or want to dig into the structure, DM me — I'm always happy to connect with other motion-nerds and frontend lovers 😄
+## Run with Docker (Recommended)
 
-nextjs #tailwindcss #gsap #webdev #frontend #showcase
+รัน services หลักจาก root:
+
+```bash
+docker compose up -d db redis
+```
+
+ตรวจสอบว่า container ขึ้นครบ:
+
+```bash
+docker ps
+```
+
+## Run API (Local)
+
+```bash
+cd apps/api
+npm run prisma:generate
+npm run prisma:migrate
+npm run dev
+```
+
+API default: `http://localhost:4000`
+
+## Run Web (Local)
+
+```bash
+cd apps/web
+npm run dev
+```
+
+Web default: `http://localhost:3000`
+
+## Testing
+
+ตอนนี้ชุดเทสต์หลักอยู่ที่ `apps/api` (E2E)
+
+```bash
+cd apps/api
+npm run test:e2e
+```
+
+หากเจอปัญหาเกี่ยวกับฐานข้อมูลทดสอบ (`minimart_test`) ให้สร้าง DB ก่อน:
+
+```bash
+docker exec minimart_db createdb -U minimart minimart_test
+```
+
+Web tests (Vitest):
+
+```bash
+cd apps/web
+npm run test:run
+npm run test:coverage
+```
+
+## Useful Commands
+
+```bash
+# API
+cd apps/api
+npm run build
+npm run start
+
+# Web
+cd apps/web
+npm run build
+npm run start
+```
+
+## Notes
+
+- ชุด e2e ของ API ครอบคลุม auth, checkout, flash sale, dashboard, webhook safety
+- มี GitHub Actions workflow ที่ `.github/workflows/ci.yml` สำหรับ `web lint/build` และ `api build/e2e`
+- มี secret scanning workflow ที่ `.github/workflows/secret-scan.yml`
+- มี smoke test หลัง deploy ที่ `ops/smoke-test.mjs`
+- มี flow docs สำหรับ auth/checkout/webhook ที่ `docs/ARCHITECTURE_FLOWS.md`
+- มี capacity test playbook ที่ `docs/CAPACITY_TEST.md`
+- มี rollout/rollback playbook ที่ `ops/ROLLOUT_ROLLBACK.md`
+- มี incident drill guide ที่ `ops/INCIDENT_DRILL.md`
+- มี major upgrade roadmap ที่ `docs/MAJOR_UPGRADE_ROADMAP.md`

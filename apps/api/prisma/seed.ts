@@ -8,10 +8,17 @@ import { ProductsFile } from "./types/product";
 
 /**
  * SEED CONFIG
- * - Set SEED_DEBUG=1 to enable debug logs
- * - Default: quiet
+ * - SEED_DEBUG=1 to enable debug logs
+ * - SEED_FLASHSALE=0 to disable seeding FlashSaleItem
+ * - FLASHSALE_STOCK=60 (default)
+ * - FLASHSALE_QTY=1 (default)  // how many flash items to create
+ * - FLASHSALE_SKU=SKU001       // optional: pick product by sku (preferred)
  */
 const SEED_DEBUG = process.env.SEED_DEBUG === "1";
+const SEED_FLASHSALE = process.env.SEED_FLASHSALE !== "0";
+const FLASHSALE_STOCK = Number(process.env.FLASHSALE_STOCK || "60");
+const FLASHSALE_QTY = Number(process.env.FLASHSALE_QTY || "1");
+const FLASHSALE_SKU = process.env.FLASHSALE_SKU?.trim();
 
 /**
  * Resolve paths
@@ -52,7 +59,6 @@ function createPrisma() {
 
   const prisma = new PrismaClient({
     adapter,
-    // Keep logs quiet by default
     log: SEED_DEBUG ? ["query", "info", "warn", "error"] : ["warn", "error"],
   });
 
@@ -69,6 +75,84 @@ async function loadProducts(): Promise<ProductsFile["products"]> {
   const raw = fs.readFileSync(filePath, "utf-8");
   const data = JSON.parse(raw) as ProductsFile;
   return data.products ?? [];
+}
+
+function safeDate(x: unknown): Date {
+  const d = new Date(String(x));
+  if (Number.isNaN(d.getTime())) return new Date();
+  return d;
+}
+
+/**
+ * IMPORTANT:
+ * FlashSaleItem upsert below assumes:
+ * - FlashSaleItem.productId is UNIQUE (recommended)
+ *   e.g. productId String @unique
+ */
+async function seedFlashSaleItems(prisma: PrismaClient) {
+  if (!SEED_FLASHSALE) {
+    debugLog("⚪ SEED_FLASHSALE=0, skip FlashSaleItem seed");
+    return;
+  }
+
+  // pick products to attach flash sale to
+  let picks: Array<{ id: string; sku: string | null; title: string }> = [];
+
+  if (FLASHSALE_SKU) {
+    const p = await prisma.product.findUnique({
+      where: { sku: FLASHSALE_SKU },
+      select: { id: true, sku: true, title: true },
+    });
+
+    if (!p) {
+      console.log(
+        `⚠️ FLASHSALE_SKU=${FLASHSALE_SKU} not found, fallback to first products`,
+      );
+    } else {
+      picks = [p];
+    }
+  }
+
+  if (picks.length === 0) {
+    picks = await prisma.product.findMany({
+      take: FLASHSALE_QTY,
+      orderBy: { createdAt: "asc" },
+      select: { id: true, sku: true, title: true },
+    });
+  }
+
+  if (picks.length === 0) {
+    console.log("⚠️ No products found, skip FlashSaleItem seed");
+    return;
+  }
+
+  console.log(
+    `⚡ Seeding FlashSaleItem x${picks.length} (stock=${FLASHSALE_STOCK})...`,
+  );
+
+  for (const prod of picks) {
+    // If productId isn't unique in schema, this upsert will throw.
+    const item = await prisma.flashSaleItem.upsert({
+      where: { productId: prod.id },
+      create: {
+        productId: prod.id,
+        stock: FLASHSALE_STOCK,
+        reserved: 0,
+        sold: 0,
+        startsAt: new Date(),
+        endsAt: null,
+      },
+      update: {
+        stock: FLASHSALE_STOCK,
+        reserved: 0,
+        sold: 0,
+        startsAt: new Date(),
+        endsAt: null,
+      },
+    });
+
+    console.log(`✅ FLASHSALE_ID=${item.id} (product=${prod.sku ?? prod.id})`);
+  }
 }
 
 async function seed() {
@@ -145,14 +229,14 @@ async function seed() {
             ? {
                 upsert: {
                   create: {
-                    createdAt: new Date(p.meta.createdAt),
-                    updatedAt: new Date(p.meta.updatedAt),
+                    createdAt: safeDate(p.meta.createdAt),
+                    updatedAt: safeDate(p.meta.updatedAt),
                     barcode: p.meta.barcode ?? null,
                     qrCode: p.meta.qrCode ?? null,
                   },
                   update: {
-                    createdAt: new Date(p.meta.createdAt),
-                    updatedAt: new Date(p.meta.updatedAt),
+                    createdAt: safeDate(p.meta.createdAt),
+                    updatedAt: safeDate(p.meta.updatedAt),
                     barcode: p.meta.barcode ?? null,
                     qrCode: p.meta.qrCode ?? null,
                   },
@@ -167,7 +251,7 @@ async function seed() {
                 create: p.reviews.map((r) => ({
                   rating: r.rating,
                   comment: r.comment,
-                  date: new Date(r.date),
+                  date: safeDate(r.date),
                   reviewerName: r.reviewerName,
                   reviewerEmail: r.reviewerEmail,
                 })),
@@ -217,8 +301,8 @@ async function seed() {
           meta: p.meta
             ? {
                 create: {
-                  createdAt: new Date(p.meta.createdAt),
-                  updatedAt: new Date(p.meta.updatedAt),
+                  createdAt: safeDate(p.meta.createdAt),
+                  updatedAt: safeDate(p.meta.updatedAt),
                   barcode: p.meta.barcode ?? null,
                   qrCode: p.meta.qrCode ?? null,
                 },
@@ -230,7 +314,7 @@ async function seed() {
                 create: p.reviews.map((r) => ({
                   rating: r.rating,
                   comment: r.comment,
-                  date: new Date(r.date),
+                  date: safeDate(r.date),
                   reviewerName: r.reviewerName,
                   reviewerEmail: r.reviewerEmail,
                 })),
@@ -239,6 +323,9 @@ async function seed() {
         },
       });
     }
+
+    // ✅ create/update FlashSaleItem(s) and print FLASHSALE_ID
+    await seedFlashSaleItems(prisma);
 
     console.log("✅ Seed completed successfully");
   } finally {
@@ -249,5 +336,20 @@ async function seed() {
 
 seed().catch((e) => {
   console.error("❌ Seed crashed:", e);
+
+  // Common hint: FlashSaleItem.productId must be unique for upsert
+  if (
+    String(e?.message || "")
+      .toLowerCase()
+      .includes("unique") ||
+    String(e?.message || "")
+      .toLowerCase()
+      .includes("upsert")
+  ) {
+    console.error(
+      "💡 Hint: FlashSaleItem.productId should be @unique to allow upsert({ where: { productId } })",
+    );
+  }
+
   process.exit(1);
 });

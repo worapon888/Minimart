@@ -1,0 +1,104 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+      - master
+
+jobs:
+  web:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/web
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Test coverage
+        run: npm run test:coverage
+
+      - name: Build
+        env:
+          NEXT_PUBLIC_API_URL: http://localhost:4000
+          NEXT_PUBLIC_API_BASE_URL: http://localhost:4000
+          NEXTAUTH_URL: http://localhost:3000
+          NEXTAUTH_SECRET: ci_dummy_secret
+          GOOGLE_CLIENT_ID: ci_dummy_google_client_id
+          GOOGLE_CLIENT_SECRET: ci_dummy_google_client_secret
+          NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: pk_test_ci_dummy
+        run: npm run build
+
+  api:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/api
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: minimart
+          POSTGRES_PASSWORD: minimart_pw
+          POSTGRES_DB: minimart_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U minimart -d minimart"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: apps/api/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+
+      - name: Write .env.test
+        run: |
+          cat << 'EOF' > .env.test
+          DATABASE_URL=postgresql://minimart:minimart_pw@localhost:5432/minimart_test?schema=public
+          PORT=4001
+          CACHE_TTL_MS=60000
+          CACHE_MAX=200
+          CACHE_STORE=memory
+          RESERVATION_TTL_MS=600000
+          WEB_ORIGIN=http://localhost:3000
+          JWT_SECRET=ci_jwt_secret
+          JWT_REFRESH_SECRET=ci_refresh_secret
+          REFRESH_TOKEN_DAYS=14
+          THROTTLE_TTL_SECONDS=60
+          THROTTLE_LIMIT=1000
+          OTEL_ENABLED=false
+          STRIPE_SECRET_KEY=sk_test_ci_dummy
+          STRIPE_WEBHOOK_SECRET=whsec_ci_dummy
+          EOF
+
+      - name: Run API e2e
+        run: npm run test:e2e

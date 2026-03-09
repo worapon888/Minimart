@@ -1,0 +1,55 @@
+groups:
+  - name: minimart-api-alerts
+    rules:
+      - alert: CheckoutPayP95High
+        expr: |
+          histogram_quantile(
+            0.95,
+            sum(rate(checkout_pay_duration_ms_bucket[5m])) by (le)
+          ) > 1500
+        for: 5m
+        labels:
+          severity: warning
+          service: minimart-api
+        annotations:
+          summary: "Checkout pay p95 latency is high"
+          description: "checkout_pay_duration_ms p95 has been > 1500ms for 5m."
+
+      - alert: CheckoutPayErrorRatioHigh
+        expr: |
+          (
+            sum(rate(checkout_pay_total{status="error"}[5m]))
+            /
+            clamp_min(sum(rate(checkout_pay_total[5m])), 0.001)
+          ) > 0.02
+        for: 5m
+        labels:
+          severity: critical
+          service: minimart-api
+        annotations:
+          summary: "Checkout pay error ratio is high"
+          description: "checkout pay error ratio has been > 2% for 5m."
+
+      - alert: DbLockContentionIncreasing
+        expr: sum(increase(db_lock_contention_total[10m])) > 0
+        for: 10m
+        labels:
+          severity: warning
+          service: minimart-api
+        annotations:
+          summary: "DB lock contention detected"
+          description: "db_lock_contention_total increased in the last 10m."
+
+      - alert: DbQueryP95High
+        expr: |
+          histogram_quantile(
+            0.95,
+            sum(rate(db_query_duration_ms_bucket[5m])) by (le)
+          ) > 250
+        for: 5m
+        labels:
+          severity: warning
+          service: minimart-api
+        annotations:
+          summary: "DB query p95 latency is high"
+          description: "db_query_duration_ms p95 has been > 250ms for 5m."

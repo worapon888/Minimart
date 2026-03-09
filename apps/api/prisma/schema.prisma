@@ -1,5 +1,6 @@
 generator client {
-  provider = "prisma-client-js"
+  provider   = "prisma-client-js"
+  engineType = "library"
 }
 
 datasource db {
@@ -7,45 +8,60 @@ datasource db {
 }
 
 model User {
-  id        String   @id @default(cuid())
-  email     String   @unique
-  name      String?
-  role      UserRole @default(CUSTOMER)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  orders    Order[]
+  id           String     @id @default(cuid())
+  email        String     @unique
+  passwordHash String
+  name         String?
+  role         UserRole   @default(CUSTOMER)
+  status       UserStatus @default(ACTIVE)
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  orders        Order[]
+  refreshTokens RefreshToken[]
+
+  @@index([role])
+  @@index([status])
+  @@index([email])
+}
+
+enum UserStatus {
+  ACTIVE
+  DISABLED
 }
 
 model Product {
-  id                   String             @id @default(cuid())
-  sku                  String             @unique
+  id                   String        @id @default(cuid())
+  sku                  String        @unique
   title                String
   description          String?
   imageUrl             String?
   priceCents           Int
-  currency             String             @default("USD")
-  status               ProductStatus      @default(ACTIVE)
-  createdAt            DateTime           @default(now())
-  updatedAt            DateTime           @updatedAt
+  currency             String        @default("USD")
+  status               ProductStatus @default(ACTIVE)
+  createdAt            DateTime      @default(now())
+  updatedAt            DateTime      @updatedAt
   availabilityStatus   String?
   brand                String?
   category             String?
   discountPercentage   Float?
-  images               String[]           @default([])
+  images               String[]      @default([])
   minimumOrderQuantity Int?
   rating               Float?
   returnPolicy         String?
   shippingInformation  String?
-  tags                 String[]           @default([])
+  tags                 String[]      @default([])
   thumbnail            String?
   warrantyInformation  String?
   weight               Int?
-  inventory            Inventory?         @relation("ProductInventory")
-  dimensions           ProductDimensions? @relation("ProductDimensions")
-  meta                 ProductMeta?       @relation("ProductMeta")
-  reviews              Review[]
-  orderItems           OrderItem[]
-  flashSaleItem        FlashSaleItem?
+
+  inventory     Inventory?         @relation("ProductInventory")
+  dimensions    ProductDimensions? @relation("ProductDimensions")
+  meta          ProductMeta?       @relation("ProductMeta")
+  reviews       Review[]
+  orderItems    OrderItem[]
+  flashSaleItem FlashSaleItem?
+  topProducts   TopProduct[]
 
   @@index([status])
   @@index([priceCents])
@@ -59,26 +75,30 @@ model Inventory {
   reserved  Int      @default(0)
   version   Int      @default(1)
   updatedAt DateTime @updatedAt
-  product   Product  @relation("ProductInventory", fields: [productId], references: [id], onDelete: Cascade)
+
+  product Product @relation("ProductInventory", fields: [productId], references: [id], onDelete: Cascade)
 }
 
 model ProductDimensions {
-  id        String  @id @default(cuid())
-  productId String  @unique
+  id        String @id @default(cuid())
+  productId String @unique
   width     Float
   height    Float
   depth     Float
-  product   Product @relation("ProductDimensions", fields: [productId], references: [id], onDelete: Cascade)
+
+  product Product @relation("ProductDimensions", fields: [productId], references: [id], onDelete: Cascade)
 }
 
 model ProductMeta {
   id        String   @id @default(cuid())
   productId String   @unique
-  createdAt DateTime
+  createdAt DateTime @default(now())
+
   updatedAt DateTime @updatedAt
   barcode   String?
   qrCode    String?
-  product   Product  @relation("ProductMeta", fields: [productId], references: [id], onDelete: Cascade)
+
+  product Product @relation("ProductMeta", fields: [productId], references: [id], onDelete: Cascade)
 }
 
 model Review {
@@ -89,7 +109,8 @@ model Review {
   date          DateTime
   reviewerName  String
   reviewerEmail String
-  product       Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
 
   @@index([productId])
 }
@@ -130,7 +151,7 @@ model FlashSaleItem {
 
   reservations Reservation[]
 
-  @@index([productId]) // (มีอยู่แล้ว)
+  @@index([productId])
   @@index([endsAt])
   @@index([startsAt, endsAt])
 }
@@ -142,7 +163,7 @@ model Reservation {
   status          ReservationStatus @default(ACTIVE)
   expiresAt       DateTime
 
-  // ✅ แนะนำมาก: กันการยิงซ้ำจาก client/network retry (idempotency)
+  // ✅ กัน retry ยิงซ้ำ
   requestId String? @unique
 
   createdAt DateTime @default(now())
@@ -165,12 +186,11 @@ enum OrderStatus {
 model Order {
   id     String      @id @default(cuid())
   status OrderStatus @default(PENDING)
+  paidAt DateTime?
 
-  // ✅ link reservation (1 reservation -> 1 order)
   reservationId String?      @unique
   reservation   Reservation? @relation(fields: [reservationId], references: [id], onDelete: SetNull)
 
-  // ✅ optional: ถ้ามี user ใน auth แล้วค่อยใส่ตอนเริ่ม checkout หรือหลัง login
   userId String?
   user   User?   @relation(fields: [userId], references: [id], onDelete: SetNull)
 
@@ -178,7 +198,6 @@ model Order {
   subtotalCents Int
   totalCents    Int
 
-  // ✅ กัน client ยิงซ้ำ (network retry / double click)
   idempotencyKey String? @unique
 
   createdAt DateTime @default(now())
@@ -186,6 +205,10 @@ model Order {
 
   items         OrderItem[]
   paymentIntent PaymentIntent?
+
+  @@index([status])
+  @@index([status, paidAt])
+  @@index([paidAt])
 }
 
 model OrderItem {
@@ -199,10 +222,9 @@ model OrderItem {
   qty            Int
   unitPriceCents Int
   lineTotalCents Int
+  createdAt      DateTime @default(now())
 
-  createdAt DateTime @default(now())
-
-  @@index([orderId])
+  @@index([orderId, productId])
   @@index([productId])
 }
 
@@ -213,17 +235,37 @@ enum PaymentIntentStatus {
   FAILED
 }
 
-model PaymentIntent {
-  id           String              @id @default(cuid())
-  orderId      String              @unique
-  amount       Int
-  currency     String
-  status       PaymentIntentStatus @default(REQUIRES_PAYMENT_METHOD)
-  clientSecret String              @unique
-  createdAt    DateTime            @default(now())
-  updatedAt    DateTime            @updatedAt
+enum PaymentProvider {
+  STRIPE
+}
 
-  order Order @relation(fields: [orderId], references: [id])
+model PaymentIntent {
+  id String @id @default(cuid())
+
+  orderId String @unique
+  order   Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  provider PaymentProvider @default(STRIPE)
+
+  // id จาก Stripe เช่น pi_3Nxxxx
+  providerIntentId String @unique
+
+  amount   Int
+  currency String
+
+  status PaymentIntentStatus @default(REQUIRES_PAYMENT_METHOD)
+
+  // Stripe client_secret
+  clientSecret String @unique
+
+  // กัน retry ยิงซ้ำ
+  idempotencyKey String? @unique
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([status])
+  @@index([provider, providerIntentId])
 }
 
 model WebhookEvent {
@@ -247,4 +289,141 @@ model IdempotencyKey {
   createdAt   DateTime @default(now())
 
   @@unique([scope, key])
+}
+
+model DailySales {
+  id   String   @id @default(cuid())
+  date DateTime @db.Date
+
+  grossCents  Int @default(0)
+  ordersCount Int @default(0)
+  itemsSold   Int @default(0)
+
+  updatedAt DateTime @updatedAt
+
+  @@unique([date])
+  @@index([date])
+}
+
+enum TopWindow {
+  D7
+  D30
+}
+
+model TopProduct {
+  id       String    @id @default(cuid())
+  window   TopWindow
+  asOfDate DateTime  @db.Date
+
+  productId String
+  product   Product @relation(fields: [productId], references: [id], onDelete: Restrict)
+
+  qtySold      Int @default(0)
+  revenueCents Int @default(0)
+  rank         Int
+
+  updatedAt DateTime @updatedAt
+
+  @@unique([window, asOfDate, productId])
+  @@index([window, asOfDate, rank])
+  @@index([productId])
+}
+
+model RefreshToken {
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // ✅ เก็บ hash ของ refresh token (ไม่เก็บ plaintext)
+  tokenHash String @unique
+
+  // ✅ rotation / revoke
+  revokedAt  DateTime?
+  replacedBy String? // เก็บ tokenHash ของตัวใหม่ที่มาแทน (optional แต่ช่วยทำ reuse detection)
+
+  expiresAt DateTime
+
+  // optional: ผูกกับ device/ip
+  userAgent String?
+  ip        String?
+
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([expiresAt])
+  @@index([revokedAt])
+  @@index([userId, revokedAt])
+}
+
+enum AuditAction {
+  PROMOTE_TO_ADMIN
+  SET_ROLE
+  DISABLE_USER
+  ENABLE_USER
+}
+
+enum AuditStatus {
+  SUCCESS
+  FAIL
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+
+  actorId  String?
+  targetId String?
+
+  action String // เปลี่ยนจาก enum เป็น string จะยืดหยุ่นสุด
+  status AuditStatus @default(SUCCESS)
+
+  entity   String?
+  entityId String?
+
+  ip        String?
+  userAgent String?
+
+  meta Json?
+
+  @@index([actorId, createdAt])
+  @@index([targetId, createdAt])
+  @@index([action, createdAt])
+}
+
+enum ApiAuditStatus {
+  SUCCESS
+  FAIL
+}
+
+model ApiAuditLog {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+
+  // actor = user ที่เรียก API (ถ้าไม่มี auth ก็ null)
+  actorId String?
+
+  // action แบบ string จะยืดหยุ่นสุด เช่น "CHECKOUT_START", "WEBHOOK_RECEIVED"
+  action String
+
+  // request context
+  method   String
+  path     String
+  status   ApiAuditStatus @default(SUCCESS)
+  httpCode Int?
+
+  // optional domain context
+  entity   String?
+  entityId String?
+
+  // request fingerprint
+  ip        String?
+  userAgent String?
+
+  // extra info (อย่าใส่ secret)
+  meta Json?
+
+  @@index([actorId, createdAt])
+  @@index([action, createdAt])
+  @@index([status, createdAt])
+  @@index([entity, entityId])
 }

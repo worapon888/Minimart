@@ -1,0 +1,69 @@
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: minimart_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-minimart}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-minimart_pw}
+      POSTGRES_DB: ${POSTGRES_DB:-minimart}
+    ports:
+      - "5432:5432"
+    volumes:
+      - minimart_db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U minimart -d minimart -h localhost"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  redis:
+    image: redis:7-alpine
+    container_name: minimart_redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  api:
+    image: minimart-api
+    container_name: minimart_api
+    restart: unless-stopped
+    build:
+      context: ./apps/api
+      dockerfile: Dockerfile
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    ports:
+      - "4000:4000"
+    environment:
+      NODE_ENV: ${NODE_ENV:-production}
+      ALLOW_DEMO_DATA_MUTATION: ${ALLOW_DEMO_DATA_MUTATION:-false}
+      PORT: ${API_PORT:-4000}
+      DATABASE_URL: ${DATABASE_URL:-postgresql://minimart:minimart_pw@db:5432/minimart?schema=public}
+      REDIS_URL: ${REDIS_URL:-redis://redis:6379}
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET:-}
+      REFRESH_TOKEN_DAYS: ${REFRESH_TOKEN_DAYS:-14}
+      COOKIE_SECURE: ${COOKIE_SECURE:-false}
+      WEB_ORIGIN: ${WEB_ORIGIN:-http://localhost:3000}
+      CACHE_TTL_MS: ${CACHE_TTL_MS:-60000}
+      CACHE_MAX: ${CACHE_MAX:-200}
+      THROTTLE_TTL_SECONDS: ${THROTTLE_TTL_SECONDS:-60}
+      THROTTLE_LIMIT: ${THROTTLE_LIMIT:-1000}
+      OTEL_ENABLED: ${OTEL_ENABLED:-false}
+      OTEL_SERVICE_NAME: ${OTEL_SERVICE_NAME:-minimart-api}
+      OTEL_EXPORTER_OTLP_ENDPOINT: ${OTEL_EXPORTER_OTLP_ENDPOINT:-}
+      STRIPE_SECRET_KEY: ${STRIPE_SECRET_KEY}
+      STRIPE_WEBHOOK_SECRET: ${STRIPE_WEBHOOK_SECRET}
+    command: sh -c "npx prisma migrate deploy && node dist/main.js"
+
+volumes:
+  minimart_db_data:
