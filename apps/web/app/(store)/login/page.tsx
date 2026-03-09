@@ -1,13 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { FiMail, FiLock } from "react-icons/fi";
 import Image from "next/image";
 import Link from "next/link";
 
-export default function LoginPage() {
+function LoginPageContent() {
   const [form, setForm] = useState({ email: "", password: "" });
   const [error, setError] = useState("");
   const router = useRouter();
@@ -187,5 +187,13 @@ export default function LoginPage() {
         </p>
       </main>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen" />}>
+      <LoginPageContent />
+    </Suspense>
   );
 }

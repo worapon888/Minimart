@@ -6,6 +6,7 @@ import {
   useCallback,
   useLayoutEffect,
   useRef,
+  Suspense,
 } from "react";
 import Image from "next/image";
 import Link from "next/link";
@@ -72,7 +73,7 @@ async function fetchJSON<T>(url: string, init?: RequestInit): Promise<T> {
   }
 }
 
-export default function ProductsPage() {
+function ProductsPageContent() {
   const [products, setProducts] = useState<Product[]>([]);
   const [filtered, setFiltered] = useState<Product[]>([]);
   const [category, setCategory] = useState("All");
@@ -551,5 +552,13 @@ export default function ProductsPage() {
         <CartDrawer isOpen={isCartOpen} onClose={() => setCartOpen(false)} />
       </div>
     </div>
+  );
+}
+
+export default function ProductsPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen" />}>
+      <ProductsPageContent />
+    </Suspense>
   );
 }

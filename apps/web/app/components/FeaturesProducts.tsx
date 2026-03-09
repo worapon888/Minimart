@@ -3,7 +3,6 @@
 import { FaPlus } from "react-icons/fa";
 import Image from "next/image";
 import type {
-  FeaturedProduct,
   Product,
   ProductsResponse,
 } from "../../../../packages/shared/types/product";
@@ -12,7 +11,13 @@ import Link from "next/link";
 import gsap from "gsap";
 import { getPriceUSD } from "../../../../packages/shared/utils/price";
 
-type FeaturedProductUI = FeaturedProduct & {
+type FeaturedProductUI = {
+  id: string;
+  title: string;
+  price: number;
+  image: string | null;
+  category: string;
+  tag?: string;
   hasPrice: boolean;
 };
 

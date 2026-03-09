@@ -10,8 +10,8 @@ import {
   SidebarInset,
   SidebarProvider,
 } from "../../components/dashboard/ui/sidebar";
+import { authOptions } from "../../../lib/auth-options";
 import { cn } from "../../lib/utils";
-import { authOptions } from "../../api/auth/[...nextauth]/route";
 import "./global.css";
 
 // Layout
