@@ -2,24 +2,12 @@
 
 import { FaPlus } from "react-icons/fa";
 import Image from "next/image";
-import type {
-  Product,
-  ProductsResponse,
-} from "../../../../packages/shared/types/product";
+import type { Product, ProductsResponse } from "../../../../packages/shared/types/product";
 import { useEffect, useState, useLayoutEffect, useRef } from "react";
 import Link from "next/link";
 import gsap from "gsap";
 import { getPriceUSD } from "../../../../packages/shared/utils/price";
-
-type FeaturedProductUI = {
-  id: string;
-  title: string;
-  price: number;
-  image: string | null;
-  category: string;
-  tag?: string;
-  hasPrice: boolean;
-};
+import type { FeaturedProductUI } from "../lib/home-page-data";
 
 /** ---------- utils ---------- */
 const isObject = (x: unknown): x is Record<string, unknown> =>
@@ -107,20 +95,28 @@ async function fetchJSON<T>(url: string, init?: RequestInit): Promise<T> {
   }
 }
 
-export default function FeaturesProducts() {
-  const [products, setProducts] = useState<FeaturedProductUI[]>([]);
+type FeaturesProductsProps = {
+  initialProducts?: FeaturedProductUI[];
+};
+
+export default function FeaturesProducts({
+  initialProducts = [],
+}: FeaturesProductsProps) {
+  const [products, setProducts] = useState<FeaturedProductUI[]>(initialProducts);
   const progressRef = useRef<HTMLDivElement>(null);
+  const hasInitialProducts = initialProducts.length > 0;
 
   const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
 
   useEffect(() => {
+    if (hasInitialProducts) return;
+
     const controller = new AbortController();
 
     (async () => {
       try {
         const url = `${API_BASE}/products`;
         const json = await fetchJSON<unknown>(url, {
-          cache: "no-store",
           signal: controller.signal,
         });
 
@@ -156,7 +152,7 @@ export default function FeaturesProducts() {
     })();
 
     return () => controller.abort();
-  }, [API_BASE]);
+  }, [API_BASE, hasInitialProducts]);
 
   useLayoutEffect(() => {
     if (!progressRef.current) return;

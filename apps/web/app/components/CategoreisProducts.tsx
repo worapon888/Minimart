@@ -3,17 +3,10 @@
 import Image from "next/image";
 import Link from "next/link";
 import { FaPlus } from "react-icons/fa";
-import type {
-  Product,
-  ProductsResponse,
-} from "../../../../packages/shared/types/product";
+import type { Product, ProductsResponse } from "../../../../packages/shared/types/product";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import gsap from "gsap";
-
-type CategoryCard = {
-  category: string;
-  image: string | null;
-};
+import type { CategoryCard } from "../lib/home-page-data";
 
 /** ---------- type guards ---------- */
 const isObject = (x: unknown): x is Record<string, unknown> =>
@@ -77,17 +70,26 @@ const getImageSrc = (p: Product): string | null => {
   return null;
 };
 
-export default function CategoriesProducts() {
-  const [categories, setCategories] = useState<CategoryCard[]>([]);
+type CategoriesProductsProps = {
+  initialCategories?: CategoryCard[];
+};
+
+export default function CategoriesProducts({
+  initialCategories = [],
+}: CategoriesProductsProps) {
+  const [categories, setCategories] = useState<CategoryCard[]>(initialCategories);
   const progressRef = useRef<HTMLDivElement>(null);
+  const hasInitialCategories = initialCategories.length > 0;
 
   useEffect(() => {
+    if (hasInitialCategories) return;
+
     let alive = true;
     const url = `${process.env.NEXT_PUBLIC_API_URL}/products`;
 
     (async () => {
       try {
-        const res = await fetch(url, { cache: "no-store" });
+        const res = await fetch(url);
         if (!res.ok) throw new Error("Failed to fetch");
 
         const json: unknown = await res.json();
@@ -120,7 +122,7 @@ export default function CategoriesProducts() {
     return () => {
       alive = false;
     };
-  }, []);
+  }, [hasInitialCategories]);
 
   useLayoutEffect(() => {
     if (!progressRef.current) return;
