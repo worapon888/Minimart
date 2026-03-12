@@ -21,11 +21,14 @@ Architecture Overview
 MinimalMart follows a frontend / backend separation architecture.
 
 Client
-   |
+   │
+   ▼
 Next.js Web (apps/web)
-   |
+   │
+   ▼
 NestJS API (apps/api)
-   |
+   │
+   ▼
 PostgreSQL (source of truth)
 Redis (cache / reservation support)
 Stripe (payment provider)
@@ -35,7 +38,7 @@ Prometheus + Grafana
 
 The backend is organized using modular domain architecture.
 
-Main modules include:
+Main modules
 
 auth
 
@@ -53,7 +56,7 @@ webhooks
 
 dashboard
 
-Cross-cutting concerns handled globally include:
+Cross-cutting concerns
 
 validation
 
@@ -66,7 +69,6 @@ metrics
 exception filters
 
 Key Features
-
 Authentication & Security
 
 JWT authentication
@@ -79,7 +81,7 @@ Payments
 
 Stripe integration
 
-idempotent checkout & payment operations
+idempotent checkout and payment operations
 
 Flash Sale Protection
 
@@ -168,7 +170,7 @@ Shared
 
 npm workspaces
 
-shared types/utilities
+shared types / utilities
 
 Engineering Challenges Addressed
 Payment Idempotency
@@ -187,7 +189,11 @@ Webhook Deduplication
 
 Stripe webhooks may retry events multiple times.
 
-Webhook events are stored with a unique constraint (provider, eventId) to guarantee each event is processed only once.
+Webhook events are stored with a unique constraint:
+
+(provider, eventId)
+
+This guarantees each event is processed only once.
 
 Flash Sale Oversell Prevention
 
@@ -233,7 +239,7 @@ However, actual capacity must be measured with load testing.
 
 A k6 load testing playbook is included in the repository.
 
-Example performance thresholds:
+Example performance thresholds
 
 checkout_orders p95 > 1200ms
 
@@ -241,7 +247,7 @@ checkout_pay p95 > 1500ms
 
 error ratio > 2%
 
-Potential bottlenecks include:
+Potential bottlenecks
 
 checkout / payment flows (DB + Stripe latency)
 
@@ -251,19 +257,19 @@ dashboard analytics queries
 
 Known Limitations
 
-Some improvements are intentionally left open for future development:
+Some improvements are intentionally left open for future development.
 
 Shipping persistence
 
-shipping information in checkout flow is not fully persisted yet
+Shipping information in the checkout flow is not fully persisted yet.
 
 NextAuth token refresh
 
-automatic access token refresh logic is incomplete
+Automatic access token refresh logic is incomplete.
 
 Flash sale stock invariants
 
-additional safeguards could be added to strengthen stock consistency
+Additional safeguards could be added to strengthen stock consistency.
 
 Project Structure
 MinimalMart/
@@ -293,9 +299,7 @@ apps/web/.env.local
 apps/api/.env
 
 apps/api/.env.test
-
-Example setup:
-
+Example setup
 cp .env.example .env
 cp apps/api/.env.example apps/api/.env
 cp apps/api/.env.test.example apps/api/.env.test
@@ -328,14 +332,14 @@ npm run prisma:generate
 npm run prisma:migrate
 npm run dev
 
-API runs on
+API runs on:
 
 http://localhost:4000
 Run Web
 cd apps/web
 npm run dev
 
-Web runs on
+Web runs on:
 
 http://localhost:3000
 Testing
@@ -355,13 +359,9 @@ CI & Operations
 The repository includes several operational workflows.
 
 CI pipelines
-
 .github/workflows/ci.yml
-
 Secret scanning
-
 .github/workflows/secret-scan.yml
-
 Operational tooling
 
 smoke tests after deploy
