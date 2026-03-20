@@ -5,27 +5,30 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: {
-    default: "MinimalMart – Motion-first E-commerce",
+    default: "MinimalMart – Production-Style E-Commerce System",
     template: "%s | MinimalMart",
   },
   description:
-    "A beautifully crafted motion-enhanced e-commerce experience built with Next.js 15 + GSAP.",
+    "A production-style e-commerce system built with Next.js 15, focused on real-world challenges such as flash-sale concurrency, inventory reservation, payment reliability, and scalable user experience.",
   keywords: [
-    "ecommerce",
-    "frontend",
-    "motion ui",
-    "GSAP",
+    "ecommerce system",
+    "full-stack project",
     "Next.js",
-    "Tailwind CSS",
+    "TypeScript",
+    "production-ready",
+    "flash sale",
+    "inventory reservation",
+    "payment reliability",
+    "system design",
     "UX/UI",
   ],
-  authors: [{ name: "Worapon.dev", url: "https://github.com/yourgithub" }],
-  creator: "Code404",
+  authors: [{ name: "Worapon.dev", url: "https://github.com/worapon888" }],
+  creator: "Worapon.dev",
   metadataBase: new URL("https://minimart-three.vercel.app"),
   openGraph: {
-    title: "MinimalMart – Motion-first E-commerce",
+    title: "MinimalMart – Production-Style E-Commerce System",
     description:
-      "Clean UI, GSAP animation, and real-time filtering – built for the modern shopper.",
+      "Built to explore real-world e-commerce architecture, including flash-sale concurrency, inventory reservation, payment flows, and production-focused frontend experience.",
     url: "https://minimart-three.vercel.app",
     siteName: "MinimalMart",
     images: [
@@ -33,7 +36,7 @@ export const metadata: Metadata = {
         url: "/Logo.png",
         width: 1200,
         height: 630,
-        alt: "MinimalMart – Premium Motion UI Store",
+        alt: "MinimalMart – Production-Style E-Commerce System",
       },
     ],
     locale: "en_US",
@@ -41,9 +44,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "MinimalMart – Motion-first E-commerce",
+    title: "MinimalMart – Production-Style E-Commerce System",
     description:
-      "Experience smooth interactions and beautiful design powered by GSAP + Next.js.",
+      "A full-stack e-commerce project focused on real-world system behavior, payment reliability, and production-ready user experience.",
     images: ["/Logo.png"],
   },
   icons: {
